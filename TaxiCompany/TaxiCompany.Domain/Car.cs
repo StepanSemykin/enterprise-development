@@ -4,16 +4,28 @@
 /// </summary>
 public class Car
 {
-    /// <value>Идентификатор авто</value>
+    /// <summary>
+    /// Идентификатор авто
+    /// </summary>
     public required int Id { get; set; }
-    /// <value>Цвет</value>
+    /// <summary>
+    /// Цвет
+    /// </summary>
     public required string Colour { get; set; }
-    /// <value>Модель</value>
+    /// <summary>
+    /// Модель
+    /// </summary>
     public required string Model { get; set; }
-    /// <value>Серийный номер</value>
+    /// <summary>
+    /// Серийный номер
+    /// </summary>
     public required string SerialNumber { get; set; }
-    /// <value>Год выпуска</value>
+    /// <summary>
+    /// Год выпуска
+    /// </summary>
     public required DateTime RealeseYear { get; set; }
-    /// <value>Идентификатор водителя</value>
+    /// <summary>
+    /// Идентификатор водителя
+    /// </summary>
     public required int AssignedDriverId { get; set; }
 }

@@ -4,10 +4,16 @@
 /// </summary>
 public class Client
 {
-    ///<value>Идентификатор клиента</value>
+    /// <summary>
+    /// Идентификатор клиента
+    /// </summary>
     public required int Id { get; set; }
-    ///<value>Имя и фамилия</value>
+    /// <summary>
+    /// Имя и фамилия
+    /// </summary>
     public required string FullName { get; set; }
-    ///<value>Номер телефона</value>
+    /// <summary>
+    /// Номер телефона
+    /// </summary>
     public required string PhoneNumber { get; set; }
 }
