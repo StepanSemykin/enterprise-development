@@ -26,6 +26,7 @@ public class TaxiCompanyTests(TaxiCompanyFixture fixture) : IClassFixture<TaxiCo
             .Where(x => x.Driver.Id == driverId)  
             .FirstOrDefault();
 
+        Assert.NotNull(result);
         Assert.Equal(expectedDriver, result.Driver);
         Assert.Equal(expectedCar, result.Car);
     }
@@ -87,13 +88,7 @@ public class TaxiCompanyTests(TaxiCompanyFixture fixture) : IClassFixture<TaxiCo
             )
             .ToList();
 
-        Assert.Equal(expectedData.Length, result.Count); 
-
-        for (int i = 0; i < expectedData.Length; i++)
-        {
-            Assert.Equal(expectedData[i].Client.Id, result[i].Client.Id); 
-            Assert.Equal(expectedData[i].TripCount, result[i].TripCount); 
-        }
+        Assert.Equal(expectedData, result);
     }
     /// <summary>
     /// Выводит топ 5 водителей по совершенному количеству поездок
@@ -119,11 +114,11 @@ public class TaxiCompanyTests(TaxiCompanyFixture fixture) : IClassFixture<TaxiCo
             })
             .Join(_fixture.DriversList,           
                   carGroup => carGroup.CarId,     
-                  driver => driver.AssignedCarId, 
-                  (carGroup, driver) => new       
+                  driver => driver.AssignedCarId,
+                  (carGroup, driver) => new
                   {
                       Driver = driver,
-                      TripCount = carGroup.TripCount
+                      carGroup.TripCount
                   })
             .OrderByDescending(d => d.TripCount) 
             .Take(5)                              
@@ -191,38 +186,34 @@ public class TaxiCompanyTests(TaxiCompanyFixture fixture) : IClassFixture<TaxiCo
         };
 
         var drivers = _fixture.TripsList
-            .GroupBy(trip => trip.AssignedCarId)  
+            .GroupBy(trip => trip.AssignedCarId)
             .Select(group => new
             {
-                CarId = group.Key,                
-                TripCount = group.Count(),        
-                AvgDrivingTime = new TimeOnly(0, 0).Add(group
-                    .Select(t => t.DrivingTime.ToTimeSpan())  
-                    .Aggregate(TimeSpan.Zero, (t1, t2) => t1 + t2) 
-                    .Divide(group.Count() == 0 ? 1 : group.Count())), 
-                MaxDrivingTime = group.Max(t => t.DrivingTime)  
+                CarId = group.Key,
+                TripCount = group.Count(),
+
+                AvgDrivingTime = TimeOnly.FromTimeSpan(TimeSpan.FromTicks(
+                    (long)group
+                        .Select(t => t.DrivingTime.ToTimeSpan().Ticks)
+                        .DefaultIfEmpty(0)
+                        .Average()
+                )),
+
+                MaxDrivingTime = TimeOnly.FromTimeSpan(group.Max(t => t.DrivingTime.ToTimeSpan()))
             })
-            .Join(_fixture.DriversList,          
-                  carGroup => carGroup.CarId,      
-                  driver => driver.AssignedCarId,  
-                  (carGroup, driver) => new        
+            .Join(_fixture.DriversList,
+                  carGroup => carGroup.CarId,
+                  driver => driver.AssignedCarId,
+                  (carGroup, driver) => new
                   {
                       Driver = driver,
-                      TripCount = carGroup.TripCount,
-                      AvgDrivingTime = carGroup.AvgDrivingTime,
-                      MaxDrivingTime = carGroup.MaxDrivingTime
+                      carGroup.TripCount,
+                      carGroup.AvgDrivingTime,
+                      carGroup.MaxDrivingTime
                   })
             .ToList();
 
-        Assert.Equal(expectedData.Length, drivers.Count);
-
-        for (int i = 0; i < expectedData.Length; i++)
-        {
-            Assert.Equal(expectedData[i].Driver.Id, drivers[i].Driver.Id);  
-            Assert.Equal(expectedData[i].TripCount, drivers[i].TripCount);  
-            Assert.Equal(expectedData[i].AvgDrivingTime, drivers[i].AvgDrivingTime);  
-            Assert.Equal(expectedData[i].MaxDrivingTime, drivers[i].MaxDrivingTime);  
-        }
+        Assert.Equal(expectedData, drivers);
     }
     /// <summary>
     /// Выводит информацию о пассажирах, совершивших максимальное число поездок за указанный период
