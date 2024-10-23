@@ -6,27 +6,24 @@ public class DriverRepository : IRepository<Driver>
 
     public Driver? Get(int id) => _drivers.FirstOrDefault(d => d.Id == id);
 
-    public IEnumerable<Driver> Get()
+    public IEnumerable<Driver> Get() => _drivers;
+
+    public void Post(Driver value)
     {
-        return _drivers;
+        _drivers.Add(value);
     }
 
-    public void Post(Driver driver)
-    {
-        _drivers.Add(driver);
-    }
-
-    public bool Put(int id, Driver driver)
+    public bool Put(int id, Driver value)
     {
         var oldDriver = Get(id);
         
         if (oldDriver == null) return false;
 
-        oldDriver.FullName = driver.FullName;
-        oldDriver.PhoneNumber = driver.PhoneNumber;
-        oldDriver.Passport = driver.Passport;
-        oldDriver.Address = driver.Address;
-        oldDriver.AssignedCarId = driver.AssignedCarId;
+        oldDriver.FullName = value.FullName;
+        oldDriver.PhoneNumber = value.PhoneNumber;
+        oldDriver.Passport = value.Passport;
+        oldDriver.Address = value.Address;
+        oldDriver.AssignedCarId = value.AssignedCarId;
 
         return true;
     }
@@ -35,7 +32,7 @@ public class DriverRepository : IRepository<Driver>
     {
         var oldDriver = Get(id);
 
-        if (oldDriver != null) return false;
+        if (oldDriver == null) return false;
 
         _drivers.Remove(oldDriver);
 
