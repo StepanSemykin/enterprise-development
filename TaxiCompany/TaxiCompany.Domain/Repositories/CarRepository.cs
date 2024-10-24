@@ -1,5 +1,4 @@
-﻿
-namespace TaxiCompany.Domain.Repositories;
+﻿namespace TaxiCompany.Domain.Repositories;
 
 public class CarRepository : IRepository<Car>
 {
