@@ -7,6 +7,7 @@
 public class DriverRepository : IRepository<Driver>
 {
     private readonly List<Driver> _drivers = [];
+    private int _id = 0;
 
     /// <summary>
     /// Получает водителя по идентификатору.
@@ -27,6 +28,7 @@ public class DriverRepository : IRepository<Driver>
     /// <param name="value">Объект водителя для добавления.</param>
     public void Post(Driver value)
     {
+        value.Id = _id++;
         _drivers.Add(value);
     }
 

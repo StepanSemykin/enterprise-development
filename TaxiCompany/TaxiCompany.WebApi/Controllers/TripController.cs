@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
+using TaxiCompany.WebApi.DTO;
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -10,7 +12,7 @@ namespace TaxiCompany.WebApi.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class TripController(IRepository<Trip> repository) : ControllerBase
+public class TripController(IRepository<Trip> repository, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Получает список всех поездок.
@@ -58,8 +60,10 @@ public class TripController(IRepository<Trip> repository) : ControllerBase
     /// Если данные поездки некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] Trip value)
+    public IActionResult Post([FromBody] TripDTO valueDTO)
     {
+        var value = mapper.Map<Trip>(valueDTO); 
+
         repository.Post(value);
 
         return Ok();
@@ -75,8 +79,10 @@ public class TripController(IRepository<Trip> repository) : ControllerBase
     /// Если поездка с указанным идентификатором не найдена, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Trip value)
+    public IActionResult Put(int id, [FromBody] TripDTO valueDTO)
     {
+        var value = mapper.Map<Trip>(valueDTO);
+
         if (repository.Put(id, value)) return Ok();
         else return NotFound();
     }

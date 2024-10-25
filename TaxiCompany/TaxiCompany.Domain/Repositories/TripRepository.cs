@@ -7,6 +7,7 @@
 public class TripRepository : IRepository<Trip>
 {
     private readonly List<Trip> _trips = [];
+    private int _id = 0;
 
     /// <summary>
     /// Получает поездку по идентификатору.
@@ -27,6 +28,7 @@ public class TripRepository : IRepository<Trip>
     /// <param name="value">Объект поездки для добавления.</param>
     public void Post(Trip value)
     {
+        value.Id = _id++;
        _trips.Add(value);
     }
 

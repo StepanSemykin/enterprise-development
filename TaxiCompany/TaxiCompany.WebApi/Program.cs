@@ -1,5 +1,6 @@
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
+using TaxiCompany.WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,7 @@ builder.Services.AddSingleton<IRepository<Car>, CarRepository>();
 builder.Services.AddSingleton<IRepository<Client>, ClientRepository>();
 builder.Services.AddSingleton<IRepository<Driver>, DriverRepository>();
 builder.Services.AddSingleton<IRepository<Trip>, TripRepository>();
+builder.Services.AddAutoMapper(typeof(Mapping));
 
 var app = builder.Build();
 

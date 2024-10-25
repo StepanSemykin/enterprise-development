@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
+using TaxiCompany.WebApi.DTO;
+
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -10,7 +13,7 @@ namespace TaxiCompany.WebApi.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class CarController(IRepository<Car> repository) : ControllerBase
+public class CarController(IRepository<Car> repository, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Получает список всех автомобилей.
@@ -58,8 +61,10 @@ public class CarController(IRepository<Car> repository) : ControllerBase
     /// Если данные автомобиля некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] Car value)
+    public IActionResult Post([FromBody] CarDTO valueDTO)
     {
+        var value = mapper.Map<Car>(valueDTO);
+
         repository.Post(value);
 
         return Ok();
@@ -75,8 +80,10 @@ public class CarController(IRepository<Car> repository) : ControllerBase
     /// Если автомобиль с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Car value)
+    public IActionResult Put(int id, [FromBody] CarDTO valueDTO)
     {
+        var value = mapper.Map<Car>(valueDTO);
+
         if (repository.Put(id, value)) return Ok();
         else return NotFound();
     }

@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
+using TaxiCompany.WebApi.DTO;
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -10,7 +12,7 @@ namespace TaxiCompany.WebApi.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class ClientController(IRepository<Client> repository) : ControllerBase
+public class ClientController(IRepository<Client> repository, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Получает список всех клиентов.
@@ -58,8 +60,10 @@ public class ClientController(IRepository<Client> repository) : ControllerBase
     /// Если данные клиента некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] Client value)
+    public IActionResult Post([FromBody] ClientDTO valueDTO)
     {
+        var value = mapper.Map<Client>(valueDTO);
+
         repository.Post(value);
 
         return Ok();
@@ -75,8 +79,10 @@ public class ClientController(IRepository<Client> repository) : ControllerBase
     /// Если клиент с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] Client value)
+    public IActionResult Put(int id, [FromBody] ClientDTO valueDTO)
     {
+        var value = mapper.Map<Client>(valueDTO);
+
         if (repository.Put(id, value)) return Ok();
         else return NotFound();
     }

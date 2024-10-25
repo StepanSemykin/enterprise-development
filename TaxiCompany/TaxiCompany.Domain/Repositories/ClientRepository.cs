@@ -1,4 +1,6 @@
-﻿namespace TaxiCompany.Domain.Repositories;
+﻿using System.Security.Cryptography;
+
+namespace TaxiCompany.Domain.Repositories;
 
 /// <summary>
 /// Класс <c>Репозиторий клиентов</c>.
@@ -7,6 +9,7 @@
 public class ClientRepository : IRepository<Client>
 {
     private readonly List<Client> _clients = [];
+    private int _id = 0;
 
     /// <summary>
     /// Получает клиента по идентификатору.
@@ -27,6 +30,7 @@ public class ClientRepository : IRepository<Client>
     /// <param name="value">Объект клиента для добавления.</param>
     public void Post(Client value)
     {
+        value.Id = _id++;
         _clients.Add(value);
     }
 

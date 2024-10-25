@@ -7,6 +7,7 @@
 public class CarRepository : IRepository<Car>
 {
     private readonly List<Car> _cars = [];
+    private int _id = 0;
 
     /// <summary>
     /// Получает автомобиль по идентификатору.
@@ -27,6 +28,7 @@ public class CarRepository : IRepository<Car>
     /// <param name="value">Объект автомобиля для добавления.</param>
     public void Post(Car value)
     {
+        value.Id = _id++;
         _cars.Add(value);
     }
 
