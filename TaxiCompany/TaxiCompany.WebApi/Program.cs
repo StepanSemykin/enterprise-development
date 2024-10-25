@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddSingleton<IRepository<Car>, CarRepository>();
+builder.Services.AddSingleton<IRepository<Client>, ClientRepository>();
 builder.Services.AddSingleton<IRepository<Driver>, DriverRepository>();
+builder.Services.AddSingleton<IRepository<Trip>, TripRepository>();
 
 var app = builder.Build();
 
