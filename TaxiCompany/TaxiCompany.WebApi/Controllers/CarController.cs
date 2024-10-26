@@ -13,7 +13,7 @@ namespace TaxiCompany.WebApi.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class CarController(IRepository<Car> repository, IMapper mapper) : ControllerBase
+public class CarController(IRepository<Car> repository, IRepository<Driver> repositoryDrivers, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Получает список всех автомобилей.
@@ -65,6 +65,9 @@ public class CarController(IRepository<Car> repository, IMapper mapper) : Contro
     {
         var value = mapper.Map<Car>(valueDTO);
 
+        var driver = repositoryDrivers.Get(value.AssignedDriverId);
+        if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
+
         repository.Post(value);
 
         return Ok();
@@ -77,12 +80,16 @@ public class CarController(IRepository<Car> repository, IMapper mapper) : Contro
     /// <param name="value">Объект автомобиля с новыми данными.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если обновление прошло успешно.
+    /// Если данные автомобиля некорректны, возвращает статус 400 Bad Request.
     /// Если автомобиль с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] CarDTO valueDTO)
     {
         var value = mapper.Map<Car>(valueDTO);
+
+        var driver = repositoryDrivers.Get(value.AssignedDriverId);
+        if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
 
         if (repository.Put(id, value)) return Ok();
         else return NotFound();

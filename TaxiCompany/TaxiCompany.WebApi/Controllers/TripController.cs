@@ -12,7 +12,7 @@ namespace TaxiCompany.WebApi.Controllers;
 /// </summary>
 [Route("api/[controller]")]
 [ApiController]
-public class TripController(IRepository<Trip> repository, IMapper mapper) : ControllerBase
+public class TripController(IRepository<Trip> repository, IRepository<Client> repositoryClients, IRepository<Car> repositoryCars, IMapper mapper) : ControllerBase
 {
     /// <summary>
     /// Получает список всех поездок.
@@ -62,7 +62,12 @@ public class TripController(IRepository<Trip> repository, IMapper mapper) : Cont
     [HttpPost]
     public IActionResult Post([FromBody] TripDTO valueDTO)
     {
-        var value = mapper.Map<Trip>(valueDTO); 
+        var value = mapper.Map<Trip>(valueDTO);
+
+        var car = repositoryCars.Get(value.AssignedCarId);
+        if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
+        var client = repositoryClients.Get(value.AssignedClientId);
+        if (client == null) return BadRequest($"Client with ID {value.AssignedClientId} was not found.");
 
         repository.Post(value);
 
@@ -76,12 +81,18 @@ public class TripController(IRepository<Trip> repository, IMapper mapper) : Cont
     /// <param name="value">Объект поездки с новыми данными.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если обновление прошло успешно.
+    /// Если данные поездки некорректны, возвращает статус 400 Bad Request.
     /// Если поездка с указанным идентификатором не найдена, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
     public IActionResult Put(int id, [FromBody] TripDTO valueDTO)
     {
         var value = mapper.Map<Trip>(valueDTO);
+
+        var car = repositoryCars.Get(value.AssignedCarId);
+        if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
+        var client = repositoryClients.Get(value.AssignedClientId);
+        if (client == null) return BadRequest($"Client with ID {value.AssignedClientId} was not found.");
 
         if (repository.Put(id, value)) return Ok();
         else return NotFound();
