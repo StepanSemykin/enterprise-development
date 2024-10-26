@@ -7,7 +7,7 @@
 public class DriverRepository : IRepository<Driver>
 {
     private readonly List<Driver> _drivers = [];
-    private int _id = 0;
+    private int _id = 1;
 
     /// <summary>
     /// Получает водителя по идентификатору.

@@ -7,7 +7,7 @@
 public class CarRepository : IRepository<Car>
 {
     private readonly List<Car> _cars = [];
-    private int _id = 0;
+    private int _id = 1;
 
     /// <summary>
     /// Получает автомобиль по идентификатору.

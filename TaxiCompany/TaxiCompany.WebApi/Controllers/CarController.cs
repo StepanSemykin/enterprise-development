@@ -4,7 +4,6 @@ using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
 using TaxiCompany.WebApi.DTO;
 
-
 namespace TaxiCompany.WebApi.Controllers;
 
 /// <summary>
@@ -108,5 +107,34 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     {
         if (repository.Delete(id)) return Ok();
         else return NotFound();
+    }
+
+    /// <summary>
+    /// Получает сведения о конкретном водителе и его автомобиле.
+    /// </summary>
+    /// <param name="driverId">Идентификатор водителя.</param>
+    /// <returns>
+    /// Возвращает результат операции, который содержит сведения о водителе и его автомобиле.
+    /// Если водитель или автомобиль не найдены, возвращает статус 404 Not Found.
+    /// </returns>
+    [HttpGet("driver/{driverId}")]
+    [ProducesResponseType(typeof(DriverCarInfoDTO), 200)]
+    public IActionResult GetDriverAndCar(int driverId)
+    {
+        var driver = repositoryDrivers.Get(driverId);
+        if (driver == null) return NotFound($"Driver with ID {driverId} was not found.");
+        var car = repository.Get(driver.AssignedCarId);
+        if (car == null) return NotFound($"Car assigned to driver with ID {driverId} was not found.");
+
+        var driverDTO = mapper.Map<DriverDTO>(driver);
+        var carDTO = mapper.Map<CarDTO>(car);
+
+        var driverCarInfo = new DriverCarInfoDTO
+        {
+            Driver = driverDTO,
+            Car = carDTO
+        };
+
+        return Ok(driverCarInfo);
     }
 }

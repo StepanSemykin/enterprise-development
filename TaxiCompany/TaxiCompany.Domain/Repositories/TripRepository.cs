@@ -7,7 +7,7 @@
 public class TripRepository : IRepository<Trip>
 {
     private readonly List<Trip> _trips = [];
-    private int _id = 0;
+    private int _id = 1;
 
     /// <summary>
     /// Получает поездку по идентификатору.

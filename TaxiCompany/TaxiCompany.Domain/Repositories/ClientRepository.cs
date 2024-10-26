@@ -9,7 +9,7 @@ namespace TaxiCompany.Domain.Repositories;
 public class ClientRepository : IRepository<Client>
 {
     private readonly List<Client> _clients = [];
-    private int _id = 0;
+    private int _id = 1;
 
     /// <summary>
     /// Получает клиента по идентификатору.
