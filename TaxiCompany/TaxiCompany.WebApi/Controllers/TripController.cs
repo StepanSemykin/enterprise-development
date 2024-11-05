@@ -215,8 +215,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
                     TripCount = tc.TripCount
                 };
             })
-            .Where(d => d != null) 
-            .OrderByDescending(d => d.TripCount)
+            .OrderByDescending(d => d!.TripCount)
             .Take(5)
             .ToList();
 
