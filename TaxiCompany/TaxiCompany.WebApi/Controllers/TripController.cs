@@ -256,7 +256,13 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
                 {
                     Driver = mapper.Map<DriverDto>(driver),
                     TripCount = group.Count(),
-                    AverageDrivingTime = new TimeOnly((int)group.Average(trip => trip.DrivingTime.Hour), (int)group.Average(trip => trip.DrivingTime.Minute)),
+
+                    AverageDrivingTime = new TimeOnly(
+                        (int)(group.Average(trip => trip.DrivingTime.Hour * 3600 + trip.DrivingTime.Minute * 60 + trip.DrivingTime.Second) / 3600),
+                        (int)((group.Average(trip => trip.DrivingTime.Hour * 3600 + trip.DrivingTime.Minute * 60 + trip.DrivingTime.Second) % 3600) / 60),
+                        (int)(group.Average(trip => trip.DrivingTime.Hour * 3600 + trip.DrivingTime.Minute * 60 + trip.DrivingTime.Second) % 60)
+                        ),
+
                     MaxDrivingTime = group.Max(trip => trip.DrivingTime)
                 };
             })
