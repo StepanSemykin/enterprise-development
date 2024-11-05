@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
-using TaxiCompany.WebApi.DTO;
+using TaxiCompany.WebApi.Dto;
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -54,15 +54,15 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// <summary>
     /// Добавляет новую поездку.
     /// </summary>
-    /// <param name="value">Объект поездки, которую нужно добавить.</param>
+    /// <param name="valueDto">Объект поездки, которую нужно добавить.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если добавление прошло успешно.
     /// Если данные поездки некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] TripDTO valueDTO)
+    public IActionResult Post([FromBody] TripDto valueDto)
     {
-        var value = mapper.Map<Trip>(valueDTO);
+        var value = mapper.Map<Trip>(valueDto);
 
         var car = repositoryCars.Get(value.AssignedCarId);
         if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
@@ -78,16 +78,16 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Обновляет данные поездки по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор поездки, данные которой нужно обновить.</param>
-    /// <param name="value">Объект поездки с новыми данными.</param>
+    /// <param name="valueDto">Объект поездки с новыми данными.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если обновление прошло успешно.
     /// Если данные поездки некорректны, возвращает статус 400 Bad Request.
     /// Если поездка с указанным идентификатором не найдена, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] TripDTO valueDTO)
+    public IActionResult Put(int id, [FromBody] TripDto valueDto)
     {
-        var value = mapper.Map<Trip>(valueDTO);
+        var value = mapper.Map<Trip>(valueDto);
 
         var car = repositoryCars.Get(value.AssignedCarId);
         if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
@@ -124,7 +124,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если поездки не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("passengers")]
-    [ProducesResponseType(typeof(IEnumerable<ClientDTO>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<ClientDto>), 200)]
     public IActionResult GetClientsByDate(DateTime startDate, DateTime endDate)
     {
         if (startDate > endDate) return BadRequest("Start date cannot be later than end date.");
@@ -156,7 +156,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если нет поездок, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("trip-counts")]
-    [ProducesResponseType(typeof(IEnumerable<ClientTripCountDTO>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<ClientTripCountDto>), 200)]
     public IActionResult GetCountTrips()
     {
         var trips = repository.Get();
@@ -166,9 +166,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
 
         var tripCounts = trips
             .GroupBy(trip => trip.AssignedClientId)
-            .Select(group => new ClientTripCountDTO
+            .Select(group => new ClientTripCountDto
             {
-                Client = mapper.Map<ClientDTO>(clients.FirstOrDefault(c => c.Id == group.Key)),
+                Client = mapper.Map<ClientDto>(clients.FirstOrDefault(c => c.Id == group.Key)),
                 TripCount = group.Count()
             })
             .ToList();
@@ -184,7 +184,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если нет поездок или авто, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("top-drivers")]
-    [ProducesResponseType(typeof(IEnumerable<DriverTripCountDTO>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<DriverTripCountDto>), 200)]
     public IActionResult GetTopDrivers()
     {
         var trips = repository.Get();
@@ -209,9 +209,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
                 if (car == null) return null; 
 
                 var driver = drivers.FirstOrDefault(d => d.Id == car.AssignedDriverId);
-                return new DriverTripCountDTO
+                return new DriverTripCountDto
                 {
-                    Driver = mapper.Map<DriverDTO>(driver),
+                    Driver = mapper.Map<DriverDto>(driver),
                     TripCount = tc.TripCount
                 };
             })
@@ -231,7 +231,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если поездок нет, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("driver-trip-stats")]
-    [ProducesResponseType(typeof(IEnumerable<DriverTripStatsDTO>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<DriverTripStatsDto>), 200)]
     public IActionResult GetDriverTripStats()
     {
         var trips = repository.Get();
@@ -252,9 +252,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
                 var driver = drivers.FirstOrDefault(d => d.Id == car.AssignedDriverId);
                 if (driver == null) return null;
 
-                return new DriverTripStatsDTO
+                return new DriverTripStatsDto
                 {
-                    Driver = mapper.Map<DriverDTO>(driver),
+                    Driver = mapper.Map<DriverDto>(driver),
                     TripCount = group.Count(),
                     AverageDrivingTime = new TimeOnly((int)group.Average(trip => trip.DrivingTime.Hour), (int)group.Average(trip => trip.DrivingTime.Minute)),
                     MaxDrivingTime = group.Max(trip => trip.DrivingTime)
@@ -277,7 +277,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если поездок нет, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("top-clients")]
-    [ProducesResponseType(typeof(IEnumerable<ClientTripCountDTO>), 200)]
+    [ProducesResponseType(typeof(IEnumerable<ClientTripCountDto>), 200)]
     public IActionResult GetClientsMaxTrips(DateTime startDate, DateTime endDate)
     {
         if (startDate > endDate) return BadRequest("Start date cannot be later than end date.");
@@ -301,9 +301,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
 
         var topClients = clientTrips
             .Where(ct => ct.TripCount == maxTripCount)
-            .Select(ct => new ClientTripCountDTO
+            .Select(ct => new ClientTripCountDto
             {
-                Client = mapper.Map<ClientDTO>(repositoryClients.Get(ct.ClientId)),
+                Client = mapper.Map<ClientDto>(repositoryClients.Get(ct.ClientId)),
                 TripCount = ct.TripCount
             })
             .ToList();

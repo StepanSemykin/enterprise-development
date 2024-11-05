@@ -1,6 +1,6 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
-public class ClientDTO
+public class ClientDto
 {
     /// <summary>
     /// Имя и фамилия

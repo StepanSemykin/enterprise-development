@@ -1,11 +1,11 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
-public class ClientTripCountDTO
+public class ClientTripCountDto
 {
     /// <summary>
     /// Информация о клиенте.
     /// </summary>
-    public ClientDTO? Client { get; set; }
+    public ClientDto? Client { get; set; }
 
     /// <summary>
     /// Общее количество поездок, совершенных клиентом.

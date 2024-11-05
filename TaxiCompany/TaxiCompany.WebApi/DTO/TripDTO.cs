@@ -1,6 +1,6 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
-public class TripDTO
+public class TripDto
 {
     /// <summary>
     /// Пункт отправления

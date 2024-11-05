@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
-using TaxiCompany.WebApi.DTO;
+using TaxiCompany.WebApi.Dto;
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -54,15 +54,15 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// <summary>
     /// Добавляет нового клиента.
     /// </summary>
-    /// <param name="value">Объект клиента, который нужно добавить.</param>
+    /// <param name="valueDto">Объект клиента, который нужно добавить.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если добавление прошло успешно.
     /// Если данные клиента некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] ClientDTO valueDTO)
+    public IActionResult Post([FromBody] ClientDto valueDto)
     {
-        var value = mapper.Map<Client>(valueDTO);
+        var value = mapper.Map<Client>(valueDto);
 
         repository.Post(value);
 
@@ -73,15 +73,15 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// Обновляет данные клиента по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор клиента, данные которого нужно обновить.</param>
-    /// <param name="value">Объект клиента с новыми данными.</param>
+    /// <param name="valueDto">Объект клиента с новыми данными.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если обновление прошло успешно.
     /// Если клиент с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] ClientDTO valueDTO)
+    public IActionResult Put(int id, [FromBody] ClientDto valueDto)
     {
-        var value = mapper.Map<Client>(valueDTO);
+        var value = mapper.Map<Client>(valueDto);
 
         if (repository.Put(id, value)) return Ok();
         else return NotFound();

@@ -1,14 +1,14 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
 public class DriverCarInfoDTO
 {
     /// <summary>
     /// Информация о водителе.
     /// </summary>
-    public DriverDTO? Driver { get; set; }
+    public DriverDto? Driver { get; set; }
 
     /// <summary>
     /// Информация об автомобиле, назначенном водителю.
     /// </summary>
-    public CarDTO? Car { get; set; }
+    public CarDto? Car { get; set; }
 }

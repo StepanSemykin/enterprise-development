@@ -1,6 +1,6 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
-public class DriverDTO
+public class DriverDto
 {
     /// <summary>
     /// Имя и фамилия
@@ -21,9 +21,4 @@ public class DriverDTO
     /// Адрес
     /// </summary>
     public required string Address { get; set; }
-
-    /// <summary>
-    /// Идентификатор закрепленного автомобиля
-    /// </summary>
-    public required int AssignedCarId { get; set; }
 }

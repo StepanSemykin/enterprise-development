@@ -1,11 +1,11 @@
-﻿namespace TaxiCompany.WebApi.DTO;
+﻿namespace TaxiCompany.WebApi.Dto;
 
-public class DriverTripCountDTO
+public class DriverTripCountDto
 {
     /// <summary>
     /// Информация о водителе.
     /// </summary>
-    public DriverDTO? Driver { get; set; }
+    public DriverDto? Driver { get; set; }
 
     /// <summary>
     /// Общее количество поездок, совершенных водителем.

@@ -1,8 +1,9 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Newtonsoft.Json.Linq;
 using TaxiCompany.Domain;
 using TaxiCompany.Domain.Repositories;
-using TaxiCompany.WebApi.DTO;
+using TaxiCompany.WebApi.Dto;
 
 namespace TaxiCompany.WebApi.Controllers;
 
@@ -54,20 +55,21 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// <summary>
     /// Добавляет новый автомобиль.
     /// </summary>
-    /// <param name="value">Объект автомобиля, который нужно добавить.</param>
+    /// <param name="valueDto">Объект автомобиля, который нужно добавить.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если добавление прошло успешно.
     /// Если данные автомобиля некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] CarDTO valueDTO)
+    public IActionResult Post([FromBody] CarDto valueDto)
     {
-        var value = mapper.Map<Car>(valueDTO);
+        var value = mapper.Map<Car>(valueDto);
+        
+        repository.Post(value);
 
         var driver = repositoryDrivers.Get(value.AssignedDriverId);
         if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
-
-        repository.Post(value);
+        driver.AssignedCarId = value.Id;
 
         return Ok();
     }
@@ -76,19 +78,32 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// Обновляет данные автомобиля по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор автомобиля, данные которого нужно обновить.</param>
-    /// <param name="value">Объект автомобиля с новыми данными.</param>
+    /// <param name="valueDto">Объект автомобиля с новыми данными.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если обновление прошло успешно.
-    /// Если данные автомобиля некорректны, возвращает статус 400 Bad Request.
-    /// Если автомобиль с указанным идентификатором не найден, возвращает статус 404 Not Found.
+    /// Если автомобиль с указанным идентификатором не найден, возвращает статус 400 Bad Request.
+    /// Если водитель с указанным идентификатором не найден, возвращает статус 400 Bad Request.
+    /// Если данные автомобиля некорректны, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] CarDTO valueDTO)
+    public IActionResult Put(int id, [FromBody] CarDto valueDto)
     {
-        var value = mapper.Map<Car>(valueDTO);
+        var value = mapper.Map<Car>(valueDto);
 
-        var driver = repositoryDrivers.Get(value.AssignedDriverId);
-        if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
+        var oldValue = repository.Get(id);
+        if (oldValue == null) return BadRequest($"Car with ID {id} was not found.");
+        if (oldValue.AssignedDriverId != value.AssignedDriverId)
+        {
+            var driver = repositoryDrivers.Get(oldValue.AssignedDriverId);
+            if (driver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
+            driver.AssignedCarId = 0;
+            var newDriver = repositoryDrivers.Get(value.AssignedDriverId);
+            if (newDriver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
+            var car = repository.Get(newDriver.AssignedCarId);
+            if (car == null) return BadRequest($"Car with ID {newDriver.AssignedCarId} was not found.");
+            car.AssignedDriverId = 0;
+            newDriver.AssignedCarId = id;
+        };
 
         if (repository.Put(id, value)) return Ok();
         else return NotFound();
@@ -100,11 +115,19 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// <param name="id">Идентификатор автомобиля, который нужно удалить.</param>
     /// <returns>
     /// Возвращает статус 200 OK, если удаление прошло успешно.
-    /// Если автомобиль с указанным идентификатором не найден, возвращает статус 404 Not Found.
+    /// Если автомобиль с указанным идентификатором не найден, возвращает статус 400 Bad Request.
+    /// Если водитель с указанным идентификатором не найден, возвращает статус 400 Bad Request.
+    /// Если данные автомобиля некорректны, возвращает статус 404 Not Found.
     /// </returns>
     [HttpDelete("{id}")]
     public IActionResult Delete(int id)
     {
+        var car = repository.Get(id);
+        if (car == null) return BadRequest($"Car with ID {id} was not found.");
+        var driver = repositoryDrivers.Get(car.AssignedDriverId);
+        if (driver == null) return BadRequest($"Driver with ID {car.AssignedDriverId} was not found.");
+        driver.AssignedCarId = 0;
+
         if (repository.Delete(id)) return Ok();
         else return NotFound();
     }
@@ -126,13 +149,13 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
         var car = repository.Get(driver.AssignedCarId);
         if (car == null) return NotFound($"Car assigned to driver with ID {driverId} was not found.");
 
-        var driverDTO = mapper.Map<DriverDTO>(driver);
-        var carDTO = mapper.Map<CarDTO>(car);
+        var driverDto = mapper.Map<DriverDto>(driver);
+        var carDto = mapper.Map<CarDto>(car);
 
         var driverCarInfo = new DriverCarInfoDTO
         {
-            Driver = driverDTO,
-            Car = carDTO
+            Driver = driverDto,
+            Car = carDto
         };
 
         return Ok(driverCarInfo);
