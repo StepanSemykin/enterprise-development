@@ -141,7 +141,7 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// Если водитель или автомобиль не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet("driver/{driverId}")]
-    [ProducesResponseType(typeof(DriverCarInfoDTO), 200)]
+    [ProducesResponseType(typeof(DriverCarInfoDto), 200)]
     public IActionResult GetDriverAndCar(int driverId)
     {
         var driver = repositoryDrivers.Get(driverId);
@@ -152,7 +152,7 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
         var driverDto = mapper.Map<DriverDto>(driver);
         var carDto = mapper.Map<CarDto>(car);
 
-        var driverCarInfo = new DriverCarInfoDTO
+        var driverCarInfo = new DriverCarInfoDto
         {
             Driver = driverDto,
             Car = carDto

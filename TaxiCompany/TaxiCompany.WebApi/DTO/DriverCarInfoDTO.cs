@@ -1,6 +1,6 @@
 ﻿namespace TaxiCompany.WebApi.Dto;
 
-public class DriverCarInfoDTO
+public class DriverCarInfoDto
 {
     /// <summary>
     /// Информация о водителе.
