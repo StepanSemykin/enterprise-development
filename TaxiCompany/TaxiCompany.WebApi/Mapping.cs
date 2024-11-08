@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using TaxiCompany.Domain.Entities;
-using TaxiCompany.WebApi.DTO;
+using TaxiCompany.WebApi.Dto;
 
 namespace TaxiCompany.WebApi;
 
