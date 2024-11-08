@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
-using TaxiCompany.Domain;
+using TaxiCompany.Domain.Entities;
 using TaxiCompany.Domain.Repositories;
 using TaxiCompany.WebApi.Dto;
 

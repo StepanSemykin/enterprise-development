@@ -1,4 +1,6 @@
-﻿namespace TaxiCompany.Domain.Repositories;
+﻿using TaxiCompany.Domain.Entities;
+
+namespace TaxiCompany.Domain.Repositories;
 
 /// <summary>
 /// Класс <c>Репозиторий поездок</c>.

@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
 

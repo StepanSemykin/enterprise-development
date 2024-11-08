@@ -1,4 +1,4 @@
-﻿using TaxiCompany.Domain;
+﻿using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Tests;
 /// <summary>

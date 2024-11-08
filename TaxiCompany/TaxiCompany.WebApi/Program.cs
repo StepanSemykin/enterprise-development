@@ -1,5 +1,5 @@
 using System.Reflection;
-using TaxiCompany.Domain;
+using TaxiCompany.Domain.Entities;
 using TaxiCompany.Domain.Repositories;
 using TaxiCompany.WebApi;
 
