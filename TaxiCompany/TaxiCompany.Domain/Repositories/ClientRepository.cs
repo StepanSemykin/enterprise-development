@@ -1,4 +1,5 @@
 ﻿using System.Security.Cryptography;
+using TaxiCompany.Domain.Context;
 using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
@@ -7,23 +8,20 @@ namespace TaxiCompany.Domain.Repositories;
 /// Класс <c>Репозиторий клиентов</c>.
 /// Содержит методы для получения, добавления, изменения и удаления клиента.
 /// </summary>
-public class ClientRepository : IRepository<Client>
+public class ClientRepository(TaxiCompanyDbContext context) : IRepository<Client>
 {
-    private readonly List<Client> _clients = [];
-    private int _id = 1;
-
     /// <summary>
     /// Получает клиента по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор клиента.</param>
     /// <returns>Клиент, если найден; иначе null.</returns>
-    public Client? Get(int id) => _clients.FirstOrDefault(c => c.Id == id);
+    public Client? Get(int id) => context.Clinets.FirstOrDefault(c => c.Id == id);
 
     /// <summary>
     /// Получает всех клиентов.
     /// </summary>
     /// <returns>Коллекция всех клиентов.</returns>
-    public IEnumerable<Client> Get() => _clients;
+    public IEnumerable<Client> Get() => context.Clinets;
 
     /// <summary>
     /// Добавляет нового клиента.
@@ -31,8 +29,8 @@ public class ClientRepository : IRepository<Client>
     /// <param name="value">Объект клиента для добавления.</param>
     public void Post(Client value)
     {
-        value.Id = _id++;
-        _clients.Add(value);
+        context.Clinets.Add(value);
+        context.SaveChanges();
     }
 
     /// <summary>
@@ -49,6 +47,7 @@ public class ClientRepository : IRepository<Client>
 
         oldClient.FullName = value.FullName;
         oldClient.PhoneNumber = value.PhoneNumber;
+        context.SaveChanges();
 
         return true;
     }
@@ -64,7 +63,8 @@ public class ClientRepository : IRepository<Client>
 
         if (oldClient == null) return false;
 
-        _clients.Remove(oldClient);
+        context.Clinets.Remove(oldClient);
+        context.SaveChanges();
 
         return true;
     }

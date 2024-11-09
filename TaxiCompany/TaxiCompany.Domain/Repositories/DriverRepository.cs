@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Entities;
+﻿using TaxiCompany.Domain.Context;
+using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
 
@@ -6,23 +7,20 @@ namespace TaxiCompany.Domain.Repositories;
 /// Класс <c>Репозиторий водителей</c>.
 /// Содержит методы для получения, добавления, изменения и удаления водителей.
 /// </summary>
-public class DriverRepository : IRepository<Driver>
+public class DriverRepository(TaxiCompanyDbContext context) : IRepository<Driver>
 {
-    private readonly List<Driver> _drivers = [];
-    private int _id = 1;
-
     /// <summary>
     /// Получает водителя по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор водителя.</param>
     /// <returns>Водитель, если найден; иначе null.</returns>
-    public Driver? Get(int id) => _drivers.FirstOrDefault(d => d.Id == id);
+    public Driver? Get(int id) => context.Drivers.FirstOrDefault(d => d.Id == id);
 
     /// <summary>
     /// Получает всех водителей.
     /// </summary>
     /// <returns>Коллекция всех водителей.</returns>
-    public IEnumerable<Driver> Get() => _drivers;
+    public IEnumerable<Driver> Get() => context.Drivers;
 
     /// <summary>
     /// Добавляет нового водителя.
@@ -30,8 +28,8 @@ public class DriverRepository : IRepository<Driver>
     /// <param name="value">Объект водителя для добавления.</param>
     public void Post(Driver value)
     {
-        value.Id = _id++;
-        _drivers.Add(value);
+        context.Drivers.Add(value);
+        context.SaveChanges();
     }
 
     /// <summary>
@@ -51,6 +49,7 @@ public class DriverRepository : IRepository<Driver>
         oldDriver.Passport = value.Passport;
         oldDriver.Address = value.Address;
         oldDriver.AssignedCarId = value.AssignedCarId;
+        context.SaveChanges();
 
         return true;
     }
@@ -66,7 +65,8 @@ public class DriverRepository : IRepository<Driver>
 
         if (oldDriver == null) return false;
 
-        _drivers.Remove(oldDriver);
+        context.Drivers.Remove(oldDriver);
+        context.SaveChanges();
 
         return true;
     }

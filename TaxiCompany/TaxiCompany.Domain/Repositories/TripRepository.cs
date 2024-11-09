@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Entities;
+﻿using TaxiCompany.Domain.Context;
+using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
 
@@ -6,23 +7,20 @@ namespace TaxiCompany.Domain.Repositories;
 /// Класс <c>Репозиторий поездок</c>.
 /// Содержит методы для получения, добавления, изменения и удаления поездки.
 /// </summary>
-public class TripRepository : IRepository<Trip>
+public class TripRepository(TaxiCompanyDbContext context) : IRepository<Trip>
 {
-    private readonly List<Trip> _trips = [];
-    private int _id = 1;
-
     /// <summary>
     /// Получает поездку по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор поездки.</param>
     /// <returns>Поездка, если найдена; иначе null.</returns>
-    public Trip? Get(int id) => _trips.FirstOrDefault(t => t.Id == id);
+    public Trip? Get(int id) => context.Trips.FirstOrDefault(t => t.Id == id);
 
     /// <summary>
     /// Получает все поездки.
     /// </summary>
     /// <returns>Коллекция всех поездок.</returns>
-    public IEnumerable<Trip> Get() => _trips;
+    public IEnumerable<Trip> Get() => context.Trips;
 
     /// <summary>
     /// Добавляет новую поездку.
@@ -30,8 +28,8 @@ public class TripRepository : IRepository<Trip>
     /// <param name="value">Объект поездки для добавления.</param>
     public void Post(Trip value)
     {
-        value.Id = _id++;
-       _trips.Add(value);
+        context.Trips.Add(value);
+        context.SaveChanges();
     }
 
     /// <summary>
@@ -53,6 +51,7 @@ public class TripRepository : IRepository<Trip>
         oldTrip.Cost = value.Cost;  
         oldTrip.AssignedClientId = value.AssignedClientId;
         oldTrip.AssignedCarId = value.AssignedCarId;
+        context.SaveChanges();
 
         return true;
     }
@@ -68,7 +67,8 @@ public class TripRepository : IRepository<Trip>
 
         if (oldTrip == null) return false;
 
-        _trips.Remove(oldTrip); 
+        context.Trips.Remove(oldTrip);
+        context.SaveChanges();
 
         return true;
     }

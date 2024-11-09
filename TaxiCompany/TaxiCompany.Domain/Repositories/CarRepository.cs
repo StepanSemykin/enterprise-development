@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Entities;
+﻿using TaxiCompany.Domain.Context;
+using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
 
@@ -6,23 +7,20 @@ namespace TaxiCompany.Domain.Repositories;
 /// Класс <c>Репозиторий авто</c>.
 /// Содержит методы для получения, добавления, изменения и удаления авто.
 /// </summary>
-public class CarRepository : IRepository<Car>
+public class CarRepository(TaxiCompanyDbContext context) : IRepository<Car>
 {
-    private readonly List<Car> _cars = [];
-    private int _id = 1;
-
     /// <summary>
     /// Получает автомобиль по идентификатору.
     /// </summary>
     /// <param name="id">Идентификатор автомобиля.</param>
     /// <returns>Объект автомобиля, если найден; иначе null.</returns>
-    public Car? Get(int id) => _cars.FirstOrDefault(c => c.Id == id);
+    public Car? Get(int id) => context.Cars.FirstOrDefault(c => c.Id == id);
 
     /// <summary>
     /// Получает все автомобили.
     /// </summary>
     /// <returns>Коллекция всех авто.</returns>
-    public IEnumerable<Car> Get() => _cars;
+    public IEnumerable<Car> Get() => context.Cars;
 
     /// <summary>
     /// Добавляет новый автомобиль.
@@ -30,8 +28,8 @@ public class CarRepository : IRepository<Car>
     /// <param name="value">Объект автомобиля для добавления.</param>
     public void Post(Car value)
     {
-        value.Id = _id++;
-        _cars.Add(value);
+        context.Cars.Add(value);
+        context.SaveChanges();
     }
 
     /// <summary>
@@ -51,6 +49,7 @@ public class CarRepository : IRepository<Car>
         oldCar.SerialNumber = value.SerialNumber;
         oldCar.RealeseYear = value.RealeseYear;
         oldCar.AssignedDriverId = value.AssignedDriverId;
+        context.SaveChanges();
 
         return true;
     }
@@ -66,7 +65,8 @@ public class CarRepository : IRepository<Car>
 
         if (oldCar == null) return false;
 
-        _cars.Remove(oldCar);
+        context.Cars.Remove(oldCar);
+        context.SaveChanges();
 
         return true;
     }
