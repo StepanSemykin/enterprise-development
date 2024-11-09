@@ -23,9 +23,9 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Car>), 200)]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var cars = repository.Get();
+        var cars = await repository.GetAsync();
 
         if (cars == null) return NotFound();
 
@@ -42,9 +42,9 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// </returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Car), 200)]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var car = repository.Get(id);
+        var car = await repository.GetAsync(id);
 
         if (car == null) return NotFound();
 
@@ -60,15 +60,16 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// Если данные автомобиля некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] CarDto valueDto)
+    public async Task<IActionResult> Post([FromBody] CarDto valueDto)
     {
         var value = mapper.Map<Car>(valueDto);
-        
-        repository.Post(value);
 
-        var driver = repositoryDrivers.Get(value.AssignedDriverId);
+        await repository.PostAsync(value);
+
+        var driver = await repositoryDrivers.GetAsync(value.AssignedDriverId);
         if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
         driver.AssignedCarId = value.Id;
+        await repositoryDrivers.PutAsync(driver.Id, driver);
 
         return Ok();
     }
@@ -85,26 +86,29 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// Если данные автомобиля некорректны, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] CarDto valueDto)
+    public async Task<IActionResult> Put(int id, [FromBody] CarDto valueDto)
     {
         var value = mapper.Map<Car>(valueDto);
 
-        var oldValue = repository.Get(id);
+        var oldValue = await repository.GetAsync(id);
         if (oldValue == null) return BadRequest($"Car with ID {id} was not found.");
         if (oldValue.AssignedDriverId != value.AssignedDriverId)
         {
-            var driver = repositoryDrivers.Get(oldValue.AssignedDriverId);
+            var driver = await repositoryDrivers.GetAsync(oldValue.AssignedDriverId);
             if (driver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
             driver.AssignedCarId = 0;
-            var newDriver = repositoryDrivers.Get(value.AssignedDriverId);
+            await repositoryDrivers.PutAsync(driver.Id, driver);
+            var newDriver = await repositoryDrivers.GetAsync(value.AssignedDriverId);
             if (newDriver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
-            var car = repository.Get(newDriver.AssignedCarId);
+            var car = await repository.GetAsync(newDriver.AssignedCarId);
             if (car == null) return BadRequest($"Car with ID {newDriver.AssignedCarId} was not found.");
             car.AssignedDriverId = 0;
+            await repository.PutAsync(car.Id, car);
             newDriver.AssignedCarId = id;
+            await repositoryDrivers.PutAsync(newDriver.Id, newDriver);
         };
 
-        if (repository.Put(id, value)) return Ok();
+        if (await repository.PutAsync(id, value)) return Ok();
         else return NotFound();
     }
 
@@ -119,15 +123,16 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// Если данные автомобиля некорректны, возвращает статус 404 Not Found.
     /// </returns>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var car = repository.Get(id);
+        var car = await repository.GetAsync(id);
         if (car == null) return BadRequest($"Car with ID {id} was not found.");
-        var driver = repositoryDrivers.Get(car.AssignedDriverId);
+        var driver = await repositoryDrivers.GetAsync(car.AssignedDriverId);
         if (driver == null) return BadRequest($"Driver with ID {car.AssignedDriverId} was not found.");
         driver.AssignedCarId = 0;
+        await repositoryDrivers.PutAsync(driver.Id, driver);
 
-        if (repository.Delete(id)) return Ok();
+        if (await repository.DeleteAsync(id)) return Ok();
         else return NotFound();
     }
 
@@ -141,11 +146,11 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// </returns>
     [HttpGet("driver/{driverId}")]
     [ProducesResponseType(typeof(DriverCarInfoDto), 200)]
-    public IActionResult GetDriverAndCar(int driverId)
+    public async Task<IActionResult> GetDriverAndCar(int driverId)
     {
-        var driver = repositoryDrivers.Get(driverId);
+        var driver = await repositoryDrivers.GetAsync(driverId);
         if (driver == null) return NotFound($"Driver with ID {driverId} was not found.");
-        var car = repository.Get(driver.AssignedCarId);
+        var car = await repository.GetAsync(driver.AssignedCarId);
         if (car == null) return NotFound($"Car assigned to driver with ID {driverId} was not found.");
 
         var driverDto = mapper.Map<DriverDto>(driver);

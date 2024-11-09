@@ -23,9 +23,9 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Client>), 200)]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var clients = repository.Get();
+        var clients = await repository.GetAsync();
 
         if (clients == null) return NotFound();
 
@@ -42,9 +42,9 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// </returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Client), 200)]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var client = repository.Get(id);
+        var client = await repository.GetAsync(id);
 
         if (client == null) return NotFound();
 
@@ -60,11 +60,11 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// Если данные клиента некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] ClientDto valueDto)
+    public async Task<IActionResult> Post([FromBody] ClientDto valueDto)
     {
         var value = mapper.Map<Client>(valueDto);
 
-        repository.Post(value);
+        await repository.PostAsync(value);
 
         return Ok();
     }
@@ -79,11 +79,11 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// Если клиент с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] ClientDto valueDto)
+    public async Task<IActionResult> Put(int id, [FromBody] ClientDto valueDto)
     {
         var value = mapper.Map<Client>(valueDto);
 
-        if (repository.Put(id, value)) return Ok();
+        if (await repository.PutAsync(id, value)) return Ok();
         else return NotFound();
     }
 
@@ -96,9 +96,9 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// Если клиент с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (repository.Delete(id)) return Ok();
+        if (await repository.DeleteAsync(id)) return Ok();
         else return NotFound();
     }
 }

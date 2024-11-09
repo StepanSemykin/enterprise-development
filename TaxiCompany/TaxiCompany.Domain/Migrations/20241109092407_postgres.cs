@@ -7,7 +7,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace TaxiCompany.Domain.Migrations
 {
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class postgres : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,12 +58,6 @@ namespace TaxiCompany.Domain.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_driver", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_driver_car_assigned_car_id",
-                        column: x => x.assigned_car_id,
-                        principalTable: "car",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -88,25 +82,19 @@ namespace TaxiCompany.Domain.Migrations
                         column: x => x.assigned_car_id,
                         principalTable: "car",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_trip_client_assigned_client_id",
                         column: x => x.assigned_client_id,
                         principalTable: "client",
                         principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
                 name: "IX_car_serial_number",
                 table: "car",
                 column: "serial_number",
-                unique: true);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_driver_assigned_car_id",
-                table: "driver",
-                column: "assigned_car_id",
                 unique: true);
 
             migrationBuilder.CreateIndex(

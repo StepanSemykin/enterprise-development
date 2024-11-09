@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using TaxiCompany.Domain.Context;
 using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
@@ -14,22 +15,22 @@ public class TripRepository(TaxiCompanyDbContext context) : IRepository<Trip>
     /// </summary>
     /// <param name="id">Идентификатор поездки.</param>
     /// <returns>Поездка, если найдена; иначе null.</returns>
-    public Trip? Get(int id) => context.Trips.FirstOrDefault(t => t.Id == id);
+    public async Task<Trip?> GetAsync(int id) => await context.Trips.FirstOrDefaultAsync(t => t.Id == id);
 
     /// <summary>
     /// Получает все поездки.
     /// </summary>
     /// <returns>Коллекция всех поездок.</returns>
-    public IEnumerable<Trip> Get() => context.Trips;
+    public async Task<IEnumerable<Trip>> GetAsync() => await context.Trips.ToListAsync();
 
     /// <summary>
     /// Добавляет новую поездку.
     /// </summary>
     /// <param name="value">Объект поездки для добавления.</param>
-    public void Post(Trip value)
+    public async Task PostAsync(Trip value)
     {
         context.Trips.Add(value);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -38,20 +39,20 @@ public class TripRepository(TaxiCompanyDbContext context) : IRepository<Trip>
     /// <param name="id">Идентификатор обновляемой поездки.</param>
     /// <param name="value">Новые данные для поездки.</param>
     /// <returns>True, если обновление прошло успешно; иначе false.</returns>
-    public bool Put(int id, Trip value)
+    public async Task<bool> PutAsync(int id, Trip value)
     {
-        var oldTrip = Get(id);
+        var oldTrip = await GetAsync(id);
 
         if (oldTrip == null) return false;
 
         oldTrip.Departure = value.Departure;
         oldTrip.Destination = value.Destination;
         oldTrip.Date = value.Date;
-        oldTrip.DrivingTime = value.DrivingTime;    
-        oldTrip.Cost = value.Cost;  
+        oldTrip.DrivingTime = value.DrivingTime;
+        oldTrip.Cost = value.Cost;
         oldTrip.AssignedClientId = value.AssignedClientId;
         oldTrip.AssignedCarId = value.AssignedCarId;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
@@ -61,14 +62,14 @@ public class TripRepository(TaxiCompanyDbContext context) : IRepository<Trip>
     /// </summary>
     /// <param name="id">Идентификатор удаляемой поездки.</param>
     /// <returns>True, если удаление прошло успешно; иначе false.</returns>
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var oldTrip = Get(id);
+        var oldTrip = await GetAsync(id);
 
         if (oldTrip == null) return false;
 
         context.Trips.Remove(oldTrip);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }

@@ -1,4 +1,4 @@
-﻿using System.Security.Cryptography;
+﻿using Microsoft.EntityFrameworkCore;
 using TaxiCompany.Domain.Context;
 using TaxiCompany.Domain.Entities;
 
@@ -15,22 +15,22 @@ public class ClientRepository(TaxiCompanyDbContext context) : IRepository<Client
     /// </summary>
     /// <param name="id">Идентификатор клиента.</param>
     /// <returns>Клиент, если найден; иначе null.</returns>
-    public Client? Get(int id) => context.Clinets.FirstOrDefault(c => c.Id == id);
+    public async Task<Client?> GetAsync(int id) => await context.Clients.FirstOrDefaultAsync(c => c.Id == id);
 
     /// <summary>
     /// Получает всех клиентов.
     /// </summary>
     /// <returns>Коллекция всех клиентов.</returns>
-    public IEnumerable<Client> Get() => context.Clinets;
+    public async Task<IEnumerable<Client>> GetAsync() => await context.Clients.ToListAsync();
 
     /// <summary>
     /// Добавляет нового клиента.
     /// </summary>
     /// <param name="value">Объект клиента для добавления.</param>
-    public void Post(Client value)
+    public async Task PostAsync(Client value)
     {
-        context.Clinets.Add(value);
-        context.SaveChanges();
+        context.Clients.Add(value);
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -39,15 +39,15 @@ public class ClientRepository(TaxiCompanyDbContext context) : IRepository<Client
     /// <param name="id">Идентификатор обновляемого клиента.</param>
     /// <param name="value">Новые данные для клиента.</param>
     /// <returns>True, если обновление прошло успешно; иначе false.</returns>
-    public bool Put(int id, Client value)
+    public async Task<bool> PutAsync(int id, Client value)
     {
-        var oldClient = Get(id);
+        var oldClient = await GetAsync(id);
 
         if (oldClient == null) return false;
 
         oldClient.FullName = value.FullName;
         oldClient.PhoneNumber = value.PhoneNumber;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
@@ -57,14 +57,14 @@ public class ClientRepository(TaxiCompanyDbContext context) : IRepository<Client
     /// </summary>
     /// <param name="id">Идентификатор удаляемого клиента.</param>
     /// <returns>True, если удаление прошло успешно; иначе false.</returns>
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var oldClient = Get(id);
+        var oldClient = await GetAsync(id);
 
         if (oldClient == null) return false;
 
-        context.Clinets.Remove(oldClient);
-        context.SaveChanges();
+        context.Clients.Remove(oldClient);
+        await context.SaveChangesAsync();
 
         return true;
     }

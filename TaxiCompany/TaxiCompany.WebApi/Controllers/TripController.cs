@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using System;
 using TaxiCompany.Domain.Entities;
 using TaxiCompany.Domain.Repositories;
 using TaxiCompany.WebApi.Dto;
@@ -23,9 +24,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Trip>), 200)]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var trips = repository.Get();
+        var trips = await repository.GetAsync();
 
         if (trips == null) return NotFound();
 
@@ -42,9 +43,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Trip), 200)]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var trip = repository.Get(id);
+        var trip = await repository.GetAsync(id);
 
         if (trip == null) return NotFound();
 
@@ -60,16 +61,16 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если данные поездки некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] TripDto valueDto)
+    public async Task<IActionResult> Post([FromBody] TripDto valueDto)
     {
         var value = mapper.Map<Trip>(valueDto);
 
-        var car = repositoryCars.Get(value.AssignedCarId);
+        var car = await repositoryCars.GetAsync(value.AssignedCarId);
         if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
-        var client = repositoryClients.Get(value.AssignedClientId);
+        var client = await repositoryClients.GetAsync(value.AssignedClientId);
         if (client == null) return BadRequest($"Client with ID {value.AssignedClientId} was not found.");
 
-        repository.Post(value);
+        await repository.PostAsync(value);
 
         return Ok();
     }
@@ -85,16 +86,16 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если поездка с указанным идентификатором не найдена, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] TripDto valueDto)
+    public async Task<IActionResult> Put(int id, [FromBody] TripDto valueDto)
     {
         var value = mapper.Map<Trip>(valueDto);
 
-        var car = repositoryCars.Get(value.AssignedCarId);
+        var car = await repositoryCars.GetAsync(value.AssignedCarId);
         if (car == null) return BadRequest($"Car with ID {value.AssignedCarId} was not found.");
-        var client = repositoryClients.Get(value.AssignedClientId);
+        var client = await repositoryClients.GetAsync(value.AssignedClientId);
         if (client == null) return BadRequest($"Client with ID {value.AssignedClientId} was not found.");
 
-        if (repository.Put(id, value)) return Ok();
+        if (await repository.PutAsync(id, value)) return Ok();
         else return NotFound();
     }
 
@@ -107,9 +108,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// Если поездка с указанным идентификатором не найдена, возвращает статус 404 Not Found.
     /// </returns>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        if (repository.Delete(id)) return Ok();
+        if (await repository.DeleteAsync(id)) return Ok();
         else return NotFound();
     }
 
@@ -125,11 +126,11 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("passengers")]
     [ProducesResponseType(typeof(IEnumerable<ClientDto>), 200)]
-    public IActionResult GetClientsByDate(DateTime startDate, DateTime endDate)
+    public async Task<IActionResult> GetClientsByDate(DateTime startDate, DateTime endDate)
     {
         if (startDate > endDate) return BadRequest("Start date cannot be later than end date.");
 
-        var trips = repository.Get();
+        var trips = await repository.GetAsync();
         if (trips == null) return NotFound();
 
         var filteredTrips = trips
@@ -138,7 +139,7 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
         if (filteredTrips == null) return NotFound("No trips found for the specified date range.");
 
         var clientIds = filteredTrips.Select(t => t.AssignedClientId).Distinct();
-        var clients = repositoryClients.Get();;
+        var clients = await repositoryClients.GetAsync();
 
         var sortedClients = clients
         .Where(client => clientIds.Contains(client.Id))
@@ -157,12 +158,12 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("trip-counts")]
     [ProducesResponseType(typeof(IEnumerable<ClientTripCountDto>), 200)]
-    public IActionResult GetCountTrips()
+    public async Task<IActionResult> GetCountTrips()
     {
-        var trips = repository.Get();
+        var trips = await repository.GetAsync();
         if (trips == null) return NotFound();
 
-        var clients = repositoryClients.Get();
+        var clients = await repositoryClients.GetAsync();
 
         var tripCounts = trips
             .GroupBy(trip => trip.AssignedClientId)
@@ -185,14 +186,14 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("top-drivers")]
     [ProducesResponseType(typeof(IEnumerable<DriverTripCountDto>), 200)]
-    public IActionResult GetTopDrivers()
+    public async Task<IActionResult> GetTopDrivers()
     {
-        var trips = repository.Get();
+        var trips = await repository.GetAsync();
         if (trips == null) return NotFound();
-        var cars = repositoryCars.Get();
+        var cars = await repositoryCars.GetAsync();
         if (cars == null) return NotFound();
 
-        var drivers = repositoryDrivers.Get();
+        var drivers = await repositoryDrivers.GetAsync();
 
         var tripCounts = trips
             .GroupBy(trip => trip.AssignedCarId)
@@ -231,15 +232,15 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("driver-trip-stats")]
     [ProducesResponseType(typeof(IEnumerable<DriverTripStatsDto>), 200)]
-    public IActionResult GetDriverTripStats()
+    public async Task<IActionResult> GetDriverTripStats()
     {
-        var trips = repository.Get();
+        var trips = await repository.GetAsync();
         if (trips == null) return NotFound();
 
-        var cars = repositoryCars.Get();
+        var cars = await repositoryCars.GetAsync();
         if (cars == null) return NotFound();
 
-        var drivers = repositoryDrivers.Get();
+        var drivers = await repositoryDrivers.GetAsync();
 
         var driverStats = trips
             .GroupBy(trip => trip.AssignedCarId)
@@ -277,15 +278,16 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </returns>
     [HttpGet("top-clients")]
     [ProducesResponseType(typeof(IEnumerable<ClientTripCountDto>), 200)]
-    public IActionResult GetClientsMaxTrips(DateTime startDate, DateTime endDate)
+    public async Task<IActionResult> GetClientsMaxTrips(DateTime startDate, DateTime endDate)
     {
         if (startDate > endDate) return BadRequest("Start date cannot be later than end date.");
 
-        var trips = repository.Get()
+        var trips = await repository.GetAsync(); 
+        if (trips == null) return NotFound();
+
+        var filteredTrips = trips
             .Where(trip => trip.Date >= startDate && trip.Date <= endDate)
             .ToList();
-
-        if (trips == null) return NotFound();
 
         var clientTrips = trips
             .GroupBy(trip => trip.AssignedClientId)
@@ -298,14 +300,15 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
 
         var maxTripCount = clientTrips.Max(ct => ct.TripCount);
 
-        var topClients = clientTrips
-            .Where(ct => ct.TripCount == maxTripCount)
-            .Select(ct => new ClientTripCountDto
-            {
-                Client = mapper.Map<ClientDto>(repositoryClients.Get(ct.ClientId)),
-                TripCount = ct.TripCount
-            })
-            .ToList();
+        var topClients = await Task.WhenAll(
+            clientTrips
+                .Where(ct => ct.TripCount == maxTripCount)
+                .Select(async ct => new ClientTripCountDto
+                {
+                    Client = mapper.Map<ClientDto>(await repositoryClients.GetAsync(ct.ClientId)),
+                    TripCount = ct.TripCount
+                })
+        );
 
         return Ok(topClients);
     }

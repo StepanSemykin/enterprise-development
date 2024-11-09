@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using TaxiCompany.Domain.Context;
 using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
@@ -14,22 +15,22 @@ public class DriverRepository(TaxiCompanyDbContext context) : IRepository<Driver
     /// </summary>
     /// <param name="id">Идентификатор водителя.</param>
     /// <returns>Водитель, если найден; иначе null.</returns>
-    public Driver? Get(int id) => context.Drivers.FirstOrDefault(d => d.Id == id);
+    public async Task<Driver?> GetAsync(int id) => await context.Drivers.FirstOrDefaultAsync(d => d.Id == id);
 
     /// <summary>
     /// Получает всех водителей.
     /// </summary>
     /// <returns>Коллекция всех водителей.</returns>
-    public IEnumerable<Driver> Get() => context.Drivers;
+    public async Task<IEnumerable<Driver>> GetAsync() => await context.Drivers.ToListAsync();
 
     /// <summary>
     /// Добавляет нового водителя.
     /// </summary>
     /// <param name="value">Объект водителя для добавления.</param>
-    public void Post(Driver value)
+    public async Task PostAsync(Driver value)
     {
         context.Drivers.Add(value);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -38,10 +39,10 @@ public class DriverRepository(TaxiCompanyDbContext context) : IRepository<Driver
     /// <param name="id">Идентификатор обновляемого водителя.</param>
     /// <param name="value">Новые данные для водителя.</param>
     /// <returns>True, если обновление прошло успешно; иначе false.</returns>
-    public bool Put(int id, Driver value)
+    public async Task<bool> PutAsync(int id, Driver value)
     {
-        var oldDriver = Get(id);
-        
+        var oldDriver = await GetAsync(id);
+
         if (oldDriver == null) return false;
 
         oldDriver.FullName = value.FullName;
@@ -49,7 +50,7 @@ public class DriverRepository(TaxiCompanyDbContext context) : IRepository<Driver
         oldDriver.Passport = value.Passport;
         oldDriver.Address = value.Address;
         oldDriver.AssignedCarId = value.AssignedCarId;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
@@ -59,17 +60,15 @@ public class DriverRepository(TaxiCompanyDbContext context) : IRepository<Driver
     /// </summary>
     /// <param name="id">Идентификатор удаляемого водителя.</param>
     /// <returns>True, если удаление прошло успешно; иначе false.</returns>
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var oldDriver = Get(id);
+        var oldDriver = await GetAsync(id);
 
         if (oldDriver == null) return false;
 
         context.Drivers.Remove(oldDriver);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
-
-
 }

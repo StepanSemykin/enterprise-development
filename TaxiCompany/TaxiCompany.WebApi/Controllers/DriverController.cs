@@ -23,9 +23,9 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Driver>), 200)]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
-        var drivers = repository.Get();
+        var drivers = await repository.GetAsync();
 
         if (drivers == null) return NotFound();
 
@@ -42,12 +42,12 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// </returns>
     [HttpGet("{id}")]
     [ProducesResponseType(typeof(Driver), 200)]
-    public IActionResult Get(int id)
+    public async Task<IActionResult> Get(int id)
     {
-        var driver = repository.Get(id);
+        var driver = await repository.GetAsync(id);
 
         if (driver == null) return NotFound();
-        
+
         return Ok(driver);
     }
 
@@ -60,11 +60,11 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// Если данные водителя некорректны, возвращает статус 400 Bad Request.
     /// </returns>
     [HttpPost]
-    public IActionResult Post([FromBody] DriverDto valueDto)
+    public async Task<IActionResult> Post([FromBody] DriverDto valueDto)
     {
         var value = mapper.Map<Driver>(valueDto);
 
-        repository.Post(value);
+        await repository.PostAsync(value);
 
         return Ok();
     }
@@ -79,11 +79,11 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// Если водитель с указанным идентификатором не найден, возвращает статус 404 Not Found.
     /// </returns>
     [HttpPut("{id}")]
-    public IActionResult Put(int id, [FromBody] DriverDto valueDto)
+    public async Task<IActionResult> Put(int id, [FromBody] DriverDto valueDto)
     {
         var value = mapper.Map<Driver>(valueDto);
-   
-        if(repository.Put(id, value)) return Ok();
+
+        if (await repository.PutAsync(id, value)) return Ok();
         else return NotFound();
     }
 
@@ -98,15 +98,17 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// Если данные водителя некорректны, возвращает статус 404 Not Found.
     /// </returns>
     [HttpDelete("{id}")]
-    public IActionResult Delete(int id)
+    public async Task<IActionResult> Delete(int id)
     {
-        var driver = repository.Get(id);
-        if (driver == null) return BadRequest($"Driver with ID {id} was not found.");
-        var car = repositoryCars.Get(driver.AssignedCarId);
-        if (car == null) return BadRequest($"Car with ID {driver.AssignedCarId} was not found.");
-        car.AssignedDriverId = 0;
+        var driver = await repository.GetAsync(id);
+        if (driver == null) return NotFound($"Driver with ID {id} not found.");
+        var car = await repositoryCars.GetAsync(driver.AssignedCarId);
+        if (car == null) return BadRequest($"Car with ID {driver.AssignedCarId} not found.");
 
-        if (repository.Delete(id)) return Ok();
+        car.AssignedDriverId = 0;
+        await repositoryCars.PutAsync(car.Id, car);
+
+        if (await repository.DeleteAsync(id)) return Ok();
         else return NotFound();
     }
 }

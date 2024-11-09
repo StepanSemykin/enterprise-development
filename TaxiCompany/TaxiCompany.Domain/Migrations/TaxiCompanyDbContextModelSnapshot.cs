@@ -131,9 +131,6 @@ namespace TaxiCompany.Domain.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AssignedCarId")
-                        .IsUnique();
-
                     b.HasIndex("Passport")
                         .IsUnique();
 
@@ -193,27 +190,18 @@ namespace TaxiCompany.Domain.Migrations
                     b.ToTable("trip");
                 });
 
-            modelBuilder.Entity("TaxiCompany.Domain.Entities.Driver", b =>
-                {
-                    b.HasOne("TaxiCompany.Domain.Entities.Car", null)
-                        .WithOne()
-                        .HasForeignKey("TaxiCompany.Domain.Entities.Driver", "AssignedCarId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("TaxiCompany.Domain.Entities.Trip", b =>
                 {
                     b.HasOne("TaxiCompany.Domain.Entities.Car", null)
                         .WithMany()
                         .HasForeignKey("AssignedCarId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("TaxiCompany.Domain.Entities.Client", null)
                         .WithMany()
                         .HasForeignKey("AssignedClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
                 });
 #pragma warning restore 612, 618

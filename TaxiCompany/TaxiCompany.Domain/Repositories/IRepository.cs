@@ -2,9 +2,9 @@
 
 public interface IRepository<T>
 {
-    public IEnumerable<T> Get();
-    public T? Get(int id);
-    public void Post(T value);
-    public bool Put(int id, T value);
-    public bool Delete(int id);
+    Task<IEnumerable<T>> GetAsync();
+    Task<T?> GetAsync(int id);
+    Task PostAsync(T value);
+    Task<bool> PutAsync(int id, T value);
+    Task<bool> DeleteAsync(int id);
 }

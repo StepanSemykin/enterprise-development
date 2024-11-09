@@ -6,7 +6,7 @@ namespace TaxiCompany.Domain.Context;
 public class TaxiCompanyDbContext(DbContextOptions<TaxiCompanyDbContext> options) : DbContext(options)
 {
     public DbSet<Car> Cars { get; set; }
-    public DbSet<Client> Clinets { get; set; }
+    public DbSet<Client> Clients { get; set; }
     public DbSet<Driver> Drivers { get; set; }
     public DbSet<Trip> Trips { get; set; }
 
@@ -14,23 +14,17 @@ public class TaxiCompanyDbContext(DbContextOptions<TaxiCompanyDbContext> options
     {
         base.OnModelCreating(modelBuilder);
 
-        modelBuilder.Entity<Driver>()
-            .HasOne<Car>()
-            .WithOne()
-            .HasForeignKey<Driver>(d => d.AssignedCarId)
-            .OnDelete(DeleteBehavior.Cascade);
-
         modelBuilder.Entity<Trip>()
             .HasOne<Car>()
             .WithMany()
             .HasForeignKey(t => t.AssignedCarId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Trip>()
             .HasOne<Client>()
             .WithMany()
             .HasForeignKey(t => t.AssignedClientId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<Car>()
             .HasIndex(c => c.SerialNumber)

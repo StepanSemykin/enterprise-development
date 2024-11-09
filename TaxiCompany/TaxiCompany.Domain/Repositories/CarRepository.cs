@@ -1,4 +1,5 @@
-﻿using TaxiCompany.Domain.Context;
+﻿using Microsoft.EntityFrameworkCore;
+using TaxiCompany.Domain.Context;
 using TaxiCompany.Domain.Entities;
 
 namespace TaxiCompany.Domain.Repositories;
@@ -14,22 +15,22 @@ public class CarRepository(TaxiCompanyDbContext context) : IRepository<Car>
     /// </summary>
     /// <param name="id">Идентификатор автомобиля.</param>
     /// <returns>Объект автомобиля, если найден; иначе null.</returns>
-    public Car? Get(int id) => context.Cars.FirstOrDefault(c => c.Id == id);
+    public async Task<Car?> GetAsync(int id) => await context.Cars.FirstOrDefaultAsync(c => c.Id == id);
 
     /// <summary>
     /// Получает все автомобили.
     /// </summary>
     /// <returns>Коллекция всех авто.</returns>
-    public IEnumerable<Car> Get() => context.Cars;
+    public async Task<IEnumerable<Car>> GetAsync() => await context.Cars.ToListAsync();
 
     /// <summary>
     /// Добавляет новый автомобиль.
     /// </summary>
     /// <param name="value">Объект автомобиля для добавления.</param>
-    public void Post(Car value)
+    public async Task PostAsync(Car value)
     {
         context.Cars.Add(value);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
     }
 
     /// <summary>
@@ -38,18 +39,18 @@ public class CarRepository(TaxiCompanyDbContext context) : IRepository<Car>
     /// <param name="id">Идентификатор авто.</param>
     /// <param name="value">Новые данные для авто.</param>
     /// <returns>True, если обновление прошло успешно; иначе false.</returns>
-    public bool Put(int id, Car value)
+    public async Task<bool> PutAsync(int id, Car value)
     {
-        var oldCar = Get(id);
+        var oldCar = await GetAsync(id);
 
         if (oldCar == null) return false;
 
-        oldCar.Colour = value.Colour;   
+        oldCar.Colour = value.Colour;
         oldCar.Model = value.Model;
         oldCar.SerialNumber = value.SerialNumber;
         oldCar.RealeseYear = value.RealeseYear;
         oldCar.AssignedDriverId = value.AssignedDriverId;
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
@@ -59,14 +60,14 @@ public class CarRepository(TaxiCompanyDbContext context) : IRepository<Car>
     /// </summary>
     /// <param name="id">Идентификатор удаляемого автомобиля.</param>
     /// <returns>True, если удаление прошло успешно; иначе false.</returns>
-    public bool Delete(int id)
+    public async Task<bool> DeleteAsync(int id)
     {
-        var oldCar = Get(id);
+        var oldCar = await GetAsync(id);
 
         if (oldCar == null) return false;
 
         context.Cars.Remove(oldCar);
-        context.SaveChanges();
+        await context.SaveChangesAsync();
 
         return true;
     }
