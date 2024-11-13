@@ -27,8 +27,6 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     {
         var cars = await repository.GetAsync();
 
-        if (cars == null) return NotFound();
-
         return Ok(cars);
     }
 
@@ -64,10 +62,11 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     {
         var value = mapper.Map<Car>(valueDto);
 
-        await repository.PostAsync(value);
-
         var driver = await repositoryDrivers.GetAsync(value.AssignedDriverId);
         if (driver == null) return BadRequest($"Driver with ID {value.AssignedDriverId} was not found.");
+
+        await repository.PostAsync(value);
+
         driver.AssignedCarId = value.Id;
         await repositoryDrivers.PutAsync(driver.Id, driver);
 

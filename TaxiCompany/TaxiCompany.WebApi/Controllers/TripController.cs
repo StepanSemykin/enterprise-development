@@ -28,8 +28,6 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     {
         var trips = await repository.GetAsync();
 
-        if (trips == null) return NotFound();
-
         return Ok(trips);
     }
 

@@ -46,8 +46,6 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     {
         var client = await repository.GetAsync(id);
 
-        if (client == null) return NotFound();
-
         return Ok(client);
     }
 

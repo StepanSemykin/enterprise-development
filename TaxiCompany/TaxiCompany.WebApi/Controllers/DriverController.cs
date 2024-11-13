@@ -27,8 +27,6 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     {
         var drivers = await repository.GetAsync();
 
-        if (drivers == null) return NotFound();
-
         return Ok(drivers);
     }
 
