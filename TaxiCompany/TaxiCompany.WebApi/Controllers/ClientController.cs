@@ -26,8 +26,6 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     {
         var clients = await repository.GetAsync();
 
-        if (clients == null) return NotFound();
-
         return Ok(clients);
     }
 
@@ -44,6 +42,8 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     public async Task<IActionResult> Get(int id)
     {
         var client = await repository.GetAsync(id);
+
+        if (client == null) return NotFound();
 
         return Ok(client);
     }
