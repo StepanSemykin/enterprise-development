@@ -19,7 +19,6 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
     /// </summary>
     /// <returns>
     /// Возвращает результат операции, который содержит список автомобилей.
-    /// Если автомобили не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Car>), 200)]

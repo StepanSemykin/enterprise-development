@@ -19,7 +19,6 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
     /// </summary>
     /// <returns>
     /// Возвращает результат операции, который содержит список водителей.
-    /// Если водители не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Driver>), 200)]

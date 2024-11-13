@@ -20,7 +20,6 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
     /// </summary>
     /// <returns>
     /// Возвращает результат операции, который содержит список поездок.
-    /// Если поездки не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Trip>), 200)]

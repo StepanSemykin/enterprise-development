@@ -19,7 +19,6 @@ public class ClientController(IRepository<Client> repository, IMapper mapper) : 
     /// </summary>
     /// <returns>
     /// Возвращает результат операции, который содержит список клиентов.
-    /// Если клиенты не найдены, возвращает статус 404 Not Found.
     /// </returns>
     [HttpGet]
     [ProducesResponseType(typeof(IEnumerable<Client>), 200)]
