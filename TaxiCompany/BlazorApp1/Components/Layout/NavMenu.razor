@@ -1,0 +1,36 @@
+﻿<div class="top-row ps-3 navbar navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="">Taxi company</a>
+    </div>
+</div>
+
+<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
+
+<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
+    <nav class="flex-column">
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="cars">
+                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Cars
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="clients">
+                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Clients
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="drivers">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Drivers
+            </NavLink>
+        </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="trips">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Trips
+            </NavLink>
+        </div>
+    </nav>
+</div>
+

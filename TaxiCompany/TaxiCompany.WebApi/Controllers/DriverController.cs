@@ -100,10 +100,12 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
         var driver = await repository.GetAsync(id);
         if (driver == null) return NotFound($"Driver with ID {id} not found.");
         var car = await repositoryCars.GetAsync(driver.AssignedCarId);
-        if (car == null) return BadRequest($"Car with ID {driver.AssignedCarId} not found.");
-
-        car.AssignedDriverId = 0;
-        await repositoryCars.PutAsync(car.Id, car);
+        //if (car == null) return BadRequest($"Car with ID {driver.AssignedCarId} not found.");
+        if (car != null)
+        {
+            car.AssignedDriverId = 0;
+            await repositoryCars.PutAsync(car.Id, car);
+        }
 
         if (await repository.DeleteAsync(id)) return Ok();
         else return NotFound();

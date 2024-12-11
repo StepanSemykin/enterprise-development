@@ -1,0 +1,200 @@
+﻿@page "/clients"
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<PageTitle>Clients</PageTitle>
+
+<h1>Client management service</h1>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Full Name</th>
+            <th>Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_clients == null || !_clients.Any())
+        {
+            <tr>
+                <td colspan="4" class="text-center">No clients found.</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var client in _clients)
+            {
+                <tr>
+                    <td>@client.Id</td>
+                    <td>@client.FullName</td>
+                    <td>@client.PhoneNumber</td>
+                    <td>
+                        <button class="btn btn-primary" @onclick="@(() => ShowUpdForm(client.Id))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteClientAsync(client.Id))">Delete</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<h3>@(flagAdd ? "Add New Client" : "Edit Client")</h3>
+
+<EditForm Model="@currentClient" OnValidSubmit="@HandleFormSubmit" FormName="ClientForm">
+    <DataAnnotationsValidator />
+    
+    <div class="mb-3">
+        <label for="full-name" class="form-label">Full Name</label>
+        <InputText id="full-name" class="form-control" @bind-Value="currentClient.FullName" />
+        <ValidationMessage For="@(() => currentClient.FullName)" />
+    </div>
+    
+    <div class="mb-3">
+        <label for="phone-number" class="form-label">Phone Number</label>
+        <InputText id="phone-number" class="form-control" @bind-Value="currentClient.PhoneNumber" />
+        <ValidationMessage For="@(() => currentClient.PhoneNumber)" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
+</EditForm>
+
+@code {
+    private List<Client> _clients = new();
+    private Client currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
+    private string clientsUrl = "api/client";
+    private bool flagAdd = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadClientsAsync();
+        // Console.WriteLine($"Component initialized. Drivers count: {_drivers.Count()}");
+    }
+
+    private async Task LoadClientsAsync()
+    {
+        try
+        {
+            _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
+            Console.WriteLine($"Loaded clients: {_clients.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading clients: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading clients: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task AddClientAsync()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync(clientsUrl, currentClient);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadClientsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to add client: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to add client: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error adding client: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error adding client: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task UpdateClientAsync()
+    {
+        try
+        {
+            var updateClient = new ClientDto
+            {
+                FullName = currentClient.FullName,
+                PhoneNumber = currentClient.PhoneNumber
+            };
+            var response = await Http.PutAsJsonAsync($"{clientsUrl}/{currentClient.Id}", updateClient);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadClientsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to update client: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to update client: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error updating client: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error updating client: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteClientAsync(int clientId)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"{clientsUrl}/{clientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadClientsAsync();
+                // var routes = await Http.GetFromJsonAsync<List<Route>>(routeUrl);
+                // if (routes != null)
+                // {
+                //     routes = routes.Where(d => d.AssignedDriver.Id == driverId).ToList();
+                //     foreach (var route in routes)
+                //     {
+                //         await Http.DeleteAsync($"api/Routes/{route.Id}");
+                //     }
+                // }
+            }
+            else
+            {
+                Snackbar.Add($"Failed to delete client: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to delete client: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting client: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error deleting client: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ShowUpdForm(int clientId)
+    {
+        flagAdd = false;
+        var response = await Http.GetFromJsonAsync<Client>($"{clientsUrl}/{clientId}");
+        if (response != null)
+        {
+            currentClient = response;
+        }
+    }
+
+    private void ClearForm()
+    {
+        flagAdd = true;
+        currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
+    }
+
+    private async Task HandleFormSubmit()
+    {
+        if (flagAdd)
+        {
+            await AddClientAsync();
+        }
+        else
+        {
+            await UpdateClientAsync();
+        }
+    }
+}
+
+

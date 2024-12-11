@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxiCompany.Tests", "TaxiCo
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxiCompany.WebApi", "TaxiCompany.WebApi\TaxiCompany.WebApi.csproj", "{E7BBA689-A974-48E2-8182-8C82BCA1BCAB}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TaxiCompany.Wasm", "TaxiCompany.Wasm\TaxiCompany.Wasm.csproj", "{9F49D83C-D95A-49B8-B77E-60584662DBCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TaxiCompany.Client", "TaxiCompany.Client\TaxiCompany.Client.csproj", "{4416B6D1-7BFC-4379-A75C-9EC86A50BF8C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,10 +29,10 @@ Global
 		{E7BBA689-A974-48E2-8182-8C82BCA1BCAB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7BBA689-A974-48E2-8182-8C82BCA1BCAB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7BBA689-A974-48E2-8182-8C82BCA1BCAB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F49D83C-D95A-49B8-B77E-60584662DBCF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F49D83C-D95A-49B8-B77E-60584662DBCF}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F49D83C-D95A-49B8-B77E-60584662DBCF}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F49D83C-D95A-49B8-B77E-60584662DBCF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4416B6D1-7BFC-4379-A75C-9EC86A50BF8C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4416B6D1-7BFC-4379-A75C-9EC86A50BF8C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4416B6D1-7BFC-4379-A75C-9EC86A50BF8C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4416B6D1-7BFC-4379-A75C-9EC86A50BF8C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
