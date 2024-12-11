@@ -7,18 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Content Remove="WebApi\swagger.json" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <OpenApiReference Include="WebApi\swagger.json">
-      <CodeGenerator>NSwagCSharp</CodeGenerator>
-      <Namespace></Namespace>
-      <ClassName>TaxiCompanyApi</ClassName>
-    </OpenApiReference>
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Blazorise" Version="1.7.0" />
     <PackageReference Include="Blazorise.Bootstrap5" Version="1.7.0" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />

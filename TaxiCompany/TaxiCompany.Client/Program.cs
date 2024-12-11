@@ -1,7 +1,6 @@
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
-using TaxiCompany.Client.WebApi;
 using TaxiCompany.Client.Components;
 
 using MudBlazor;

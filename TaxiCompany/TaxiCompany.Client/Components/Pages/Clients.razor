@@ -18,7 +18,7 @@
         @if (_clients == null || !_clients.Any())
         {
             <tr>
-                <td colspan="4" class="text-center">No clients found.</td>
+                <td colspan="4" class="text-center">Clients not found</td>
             </tr>
         }
         else
@@ -39,7 +39,7 @@
     </tbody>
 </table>
 
-<h3>@(flagAdd ? "Add New Client" : "Edit Client")</h3>
+<h3>@(isAdd ? "Add New Client" : "Edit Client")</h3>
 
 <EditForm Model="@currentClient" OnValidSubmit="@HandleFormSubmit" FormName="ClientForm">
     <DataAnnotationsValidator />
@@ -60,16 +60,16 @@
     <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
 </EditForm>
 
-@code {
+@code 
+{
     private List<Client> _clients = new();
     private Client currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
     private string clientsUrl = "api/client";
-    private bool flagAdd = true;
+    private bool isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadClientsAsync();
-        // Console.WriteLine($"Component initialized. Drivers count: {_drivers.Count()}");
     }
 
     private async Task LoadClientsAsync()
@@ -90,7 +90,13 @@
     {
         try
         {
-            var response = await Http.PostAsJsonAsync(clientsUrl, currentClient);
+            var addClient = new ClientDto
+            {
+                FullName = currentClient.FullName,
+                PhoneNumber = currentClient.PhoneNumber
+            };
+            var response = await Http.PostAsJsonAsync(clientsUrl, addClient);
+
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -119,6 +125,7 @@
                 PhoneNumber = currentClient.PhoneNumber
             };
             var response = await Http.PutAsJsonAsync($"{clientsUrl}/{currentClient.Id}", updateClient);
+
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -170,30 +177,22 @@
 
     private async Task ShowUpdForm(int clientId)
     {
-        flagAdd = false;
+        isAdd = false;
+
         var response = await Http.GetFromJsonAsync<Client>($"{clientsUrl}/{clientId}");
-        if (response != null)
-        {
-            currentClient = response;
-        }
+        if (response != null) currentClient = response;
     }
 
     private void ClearForm()
     {
-        flagAdd = true;
+        isAdd = true;
         currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
     }
 
     private async Task HandleFormSubmit()
     {
-        if (flagAdd)
-        {
-            await AddClientAsync();
-        }
-        else
-        {
-            await UpdateClientAsync();
-        }
+        if (isAdd) await AddClientAsync();
+        else await UpdateClientAsync();
     }
 }
 

@@ -21,7 +21,7 @@
         @if (_drivers == null || !_drivers.Any())
         {
             <tr>
-                <td colspan="6" class="text-center">No drivers found.</td>
+                <td colspan="6" class="text-center">Drivers not found</td>
             </tr>
         }
         else
@@ -45,7 +45,7 @@
     </tbody>
 </table>
 
-<h3>@(flagAdd ? "Add New Driver" : "Edit Driver")</h3>
+<h3>@(isAdd ? "Add New Driver" : "Edit Driver")</h3>
 
 <EditForm Model="@currentDriver" OnValidSubmit=@HandleFormSubmit FormName="DriverForm">
     <div class="mb-3">
@@ -64,10 +64,6 @@
         <label for="address" class="form-label">Address</label>
         <InputText id="address" class="form-control" @bind-Value="currentDriver.Address" />
     </div>
-@*     <div class="mb-3">
-        <label for="assigned-car" class="form-label">Assigned car</label>
-        <InputNumber id="assigned-car" class="form-control" @bind-Value="currentDriver.AssignedCarId" /> 
-    </div> *@
     <button type="submit" class="btn btn-success">Save</button>
     <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
 </EditForm>
@@ -76,12 +72,11 @@
     private List<Driver> _drivers = new();
     private Driver currentDriver = new() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
     private string driversUrl = "api/driver";
-    private bool flagAdd = true;
+    private bool isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadDriversAsync();
-        // Console.WriteLine($"Component initialized. Drivers count: {_drivers.Count()}");
     }
 
     private async Task LoadDriversAsync()
@@ -191,29 +186,20 @@
 
     private async Task ShowUpdForm(int driverId)
     {
-        flagAdd = false;
+        isAdd = false;
         var response = await Http.GetFromJsonAsync<Driver>($"{driversUrl}/{driverId}");
-        if (response != null)
-        {
-            currentDriver = response;
-        }
+        if (response != null) currentDriver = response;
     }
 
     private void ClearForm()
     {
-        flagAdd = true;
+        isAdd = true;
         currentDriver = new Driver() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
     }
 
     private async Task HandleFormSubmit()
     {
-        if (flagAdd)
-        {
-            await AddDriverAsync();
-        }
-        else
-        {
-            await UpdateDriverAsync();
-        }
+        if (isAdd) await AddDriverAsync();
+        else await UpdateDriverAsync();
     }
 }
