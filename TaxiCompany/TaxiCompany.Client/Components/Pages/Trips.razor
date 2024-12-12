@@ -1,7 +1,231 @@
 ﻿@page "/trips"
+@inject HttpClient Http
+@inject ISnackbar Snackbar
 
-<PageTitle>Home</PageTitle>
+<PageTitle>Trips</PageTitle>
 
-<h1>Hello, world!</h1>
+<h1 class="text-center">Trip managment service</h1>
 
-Welcome to your new app.
+<table class="table table-striped w-100">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Departure</th>
+            <th>Destination</th>
+            <th>Date</th>
+            <th>Driving time</th>
+            <th>Cost</th>
+            <th>Assigned client</th>
+            <th>Assigned car</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_trips == null || !_trips.Any())
+        {
+            <tr>
+                <td colspan="9" class="text-center">Trips not found</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var trip in _trips)
+            {
+                <tr>
+                    <td class="align-middle">@trip.Id</td>
+                    <td class="align-middle">@trip.Departure</td>
+                    <td class="align-middle">@trip.Destination</td>
+                    <td class="align-middle">@trip.Date.ToString("dd-MM-yyyy")</td>
+                    <td class="align-middle">@trip.DrivingTime</td>
+                    <td class="align-middle">@trip.Cost</td>
+                    <td class="align-middle">@trip.AssignedClientId</td>
+                    <td class="align-middle">@trip.AssignedCarId</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-primary" @onclick="@(() => ShowUpdForm(trip.Id))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteTripAsync(trip.Id))">Delete</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<h3>@(isAdd ? "Add trip" : "Edit trip")</h3>
+
+<EditForm Model="@currentTrip" OnValidSubmit=@HandleFormSubmit FormName="TripForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="departure" class="form-label">Departure</label>
+        <InputText id="departure" class="form-control" @bind-Value="currentTrip.Departure" />
+    </div>
+
+    <div class="mb-3">
+        <label for="destination" class="form-label">Destination</label>
+        <InputText id="destination" class="form-control" @bind-Value="currentTrip.Destination" />
+    </div>
+
+    <div class="mb-3">
+        <label for="date" class="form-label">Date</label>
+        <InputDate Type="InputDateType.Date" id="date" class="form-control" @bind-Value="currentTrip.Date" />
+    </div>
+
+    <div class="mb-3">
+        <label for="driving-time" class="form-label">Driving time</label>
+        <InputDate Type="InputDateType.Time" id="driving-time" class="form-control" @bind-Value="currentTrip.DrivingTime" />
+    </div>
+
+    <div class="mb-3">
+        <label for="cost" class="form-label">Cost</label>
+        <InputNumber id="cost" class="form-control" @bind-Value="currentTrip.Cost" />
+    </div>
+
+    <div class="mb-3">
+        <label for="client-id" class="form-label">Assigned client</label>
+        <InputNumber id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId" />
+    </div>
+
+    <div class="mb-3">
+        <label for="car-id" class="form-label">Assigned car</label>
+        <InputNumber id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
+</EditForm>
+
+@code
+{
+    private List<Trip> _trips = new();
+    private Trip currentTrip = new() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
+    private string tripsUrl = "api/trip";
+    private bool isAdd = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadTripsAsync();
+    }
+
+    private async Task LoadTripsAsync()
+    {
+        try
+        {
+            _trips = await Http.GetFromJsonAsync<List<Trip>>(tripsUrl) ?? new List<Trip>();
+            Console.WriteLine($"Loaded trips: {_trips.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading trips: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading trips: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task AddTripAsync()
+    {
+        try
+        {
+            var addTrip = new TripDto
+            {
+                Departure = currentTrip.Departure,
+                Destination = currentTrip.Destination,
+                Date = currentTrip.Date.ToUniversalTime(),
+                DrivingTime = currentTrip.DrivingTime,
+                Cost = currentTrip.Cost,
+                AssignedClientId = currentTrip.AssignedClientId,
+                AssignedCarId = currentTrip.AssignedCarId
+            };
+
+            var response = await Http.PostAsJsonAsync(tripsUrl, addTrip);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadTripsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to add trip: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to add trip: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error adding trip: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error adding trip: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task UpdateTripAsync()
+    {
+        try
+        {
+            var updateTrip = new TripDto
+            {
+                Departure = currentTrip.Departure,
+                Destination = currentTrip.Destination,
+                Date = currentTrip.Date,
+                DrivingTime = currentTrip.DrivingTime,
+                Cost = currentTrip.Cost,
+                AssignedClientId = currentTrip.AssignedClientId,
+                AssignedCarId = currentTrip.AssignedCarId
+            };
+
+            var response = await Http.PutAsJsonAsync($"{tripsUrl}/{currentTrip.Id}", updateTrip);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadTripsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to update trip: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to update trip: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error updating trip: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error updating trip: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteTripAsync(int tripId)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"{tripsUrl}/{tripId}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadTripsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to delete trip: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to delete trip: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting trip: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error deleting trip: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ShowUpdForm(int tripId)
+    {
+        isAdd = false;
+        var response = await Http.GetFromJsonAsync<Trip>($"{tripsUrl}/{tripId}");
+        if (response != null) currentTrip = response;
+    }
+
+    private void ClearForm()
+    {
+        isAdd = true;
+        currentTrip = new Trip() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
+    }
+
+    private async Task HandleFormSubmit()
+    {
+        if (isAdd) await AddTripAsync();
+        else await UpdateTripAsync();
+    }
+}

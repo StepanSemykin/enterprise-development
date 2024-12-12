@@ -36,7 +36,6 @@ public class Trip
     /// Дата поездки
     /// </summary>
     [Column("date")]
-    [MaxLength(10)]
     [Required]
     public required DateTime Date { get; set; }
 
@@ -44,7 +43,6 @@ public class Trip
     /// Время в движении
     /// </summary>
     [Column("driving_time")]
-    [MaxLength(10)]
     [Required]
     public TimeOnly DrivingTime { get; set; }
 
@@ -52,7 +50,6 @@ public class Trip
     /// Стоимость
     /// </summary>
     [Column("cost")]
-    [MaxLength(10)]
     [Required]
     public required decimal Cost { get; set; }
 

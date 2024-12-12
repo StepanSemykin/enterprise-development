@@ -34,7 +34,7 @@
                     <td class="align-middle">@car.Colour</td>
                     <td class="align-middle">@car.Model</td>
                     <td class="align-middle">@car.SerialNumber</td>
-                    <td class="align-middle">@car.ReleaseYear.ToString("yyyy-MM-dd")</td>
+                    <td class="align-middle">@car.ReleaseYear.ToString("dd-MM-yyyy")</td>
                     <td class="align-middle">@car.AssignedDriverId</td>
                     <td class="text-center align-middle">
                         <button class="btn btn-primary" @onclick="@(() => ShowUpdForm(car.Id))">Edit</button>
@@ -118,11 +118,7 @@
                 ReleaseYear = currentCar.ReleaseYear.ToUniversalTime(),
                 AssignedDriverId = currentCar.AssignedDriverId
             };
-            Console.WriteLine(currentCar.Colour);
-            Console.WriteLine(currentCar.Model);
-            Console.WriteLine(currentCar.SerialNumber);
-            Console.WriteLine(currentCar.ReleaseYear);
-            Console.WriteLine(currentCar.AssignedDriverId);
+
             var response = await Http.PostAsJsonAsync(carsUrl, addCar);
             if (response.IsSuccessStatusCode)
             {
@@ -151,9 +147,10 @@
                 Colour = currentCar.Colour,
                 Model = currentCar.Model,
                 SerialNumber = currentCar.SerialNumber,
-                ReleaseYear = currentCar.ReleaseYear,
+                ReleaseYear = currentCar.ReleaseYear.ToUniversalTime(),
                 AssignedDriverId = currentCar.AssignedDriverId
             };
+
             var response = await Http.PutAsJsonAsync($"{carsUrl}/{currentCar.Id}", updateCar);
             if (response.IsSuccessStatusCode)
             {
