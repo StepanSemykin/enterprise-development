@@ -1,19 +1,216 @@
 ﻿@page "/cars"
-@rendermode InteractiveServer
+@inject HttpClient Http
+@inject ISnackbar Snackbar
 
-<PageTitle>Counter</PageTitle>
+<PageTitle>Cars</PageTitle>
 
-<h1>Counter</h1>
+<h1 class="text-center">Car managment service</h1>
 
-<p role="status">Current count: @currentCount</p>
+<table class="table table-striped w-100">
+    <thead>
+        <tr>
+            <th>Id</th>
+            <th>Colour</th>
+            <th>Model</th>
+            <th>Serial number</th>
+            <th>Release year</th>
+            <th>Assigned driver</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (_cars == null || !_cars.Any())
+        {
+            <tr>
+                <td colspan="7" class="text-center">Cars not found</td>
+            </tr>
+        }
+        else
+        {
+            @foreach (var car in _cars)
+            {
+                <tr>
+                    <td class="align-middle">@car.Id</td>
+                    <td class="align-middle">@car.Colour</td>
+                    <td class="align-middle">@car.Model</td>
+                    <td class="align-middle">@car.SerialNumber</td>
+                    <td class="align-middle">@car.ReleaseYear.ToString("yyyy-MM-dd")</td>
+                    <td class="align-middle">@car.AssignedDriverId</td>
+                    <td class="text-center align-middle">
+                        <button class="btn btn-primary" @onclick="@(() => ShowUpdForm(car.Id))">Edit</button>
+                        <button class="btn btn-danger" @onclick="@(() => DeleteCarAsync(car.Id))">Delete</button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
 
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<h3>@(isAdd ? "Add car" : "Edit car")</h3>
 
-@code {
-    private int currentCount = 0;
+<EditForm Model="@currentCar" OnValidSubmit=@HandleFormSubmit FormName="CarForm">
+    <DataAnnotationsValidator />
 
-    private void IncrementCount()
+    <div class="mb-3">
+        <label for="colour" class="form-label">Colour</label>
+        <InputText id="colour" class="form-control" @bind-Value="currentCar.Colour" />
+    </div>
+
+    <div class="mb-3">
+        <label for="model" class="form-label">Model</label>
+        <InputText id="model" class="form-control" @bind-Value="currentCar.Model" />
+    </div>
+
+    <div class="mb-3">
+        <label for="serial-number" class="form-label">Serial number</label>
+        <InputText id="serial-number" class="form-control" @bind-Value="currentCar.SerialNumber" />
+    </div>
+
+    <div class="mb-3">
+        <label for="release-year" class="form-label">Release year</label>
+        <InputDate Type="InputDateType.Date" id="release-year" class="form-control" @bind-Value="currentCar.ReleaseYear" />
+    </div> 
+
+    <div class="mb-3">
+        <label for="driver-id" class="form-label">Assigned driver</label>
+        <InputNumber id="driver-id" class="form-control" @bind-Value="currentCar.AssignedDriverId" />
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+    <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
+</EditForm>
+
+@code 
+{
+    private List<Car> _cars = new();
+    private Car currentCar = new() { Id = 0, Colour = "", Model = "", SerialNumber = "", ReleaseYear = DateTime.Now, AssignedDriverId = 0 };
+    private string carsUrl = "api/car";
+    private bool isAdd = true;
+
+    protected override async Task OnInitializedAsync()
     {
-        currentCount++;
+        await LoadCarsAsync();
+    }
+
+    private async Task LoadCarsAsync()
+    {
+        try
+        {
+            _cars = await Http.GetFromJsonAsync<List<Car>>(carsUrl) ?? new List<Car>();
+            Console.WriteLine($"Loaded cars: {_cars.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task AddCarAsync()
+    {
+        try
+        {
+            var addCar = new CarDto
+            {
+                Colour = currentCar.Colour,
+                Model = currentCar.Model,
+                SerialNumber = currentCar.SerialNumber,
+                ReleaseYear = currentCar.ReleaseYear.ToUniversalTime(),
+                AssignedDriverId = currentCar.AssignedDriverId
+            };
+            Console.WriteLine(currentCar.Colour);
+            Console.WriteLine(currentCar.Model);
+            Console.WriteLine(currentCar.SerialNumber);
+            Console.WriteLine(currentCar.ReleaseYear);
+            Console.WriteLine(currentCar.AssignedDriverId);
+            var response = await Http.PostAsJsonAsync(carsUrl, addCar);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadCarsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to add car: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to add car: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error adding car: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error adding car: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task UpdateCarAsync()
+    {
+        try
+        {
+            var updateCar = new CarDto
+            {
+                Colour = currentCar.Colour,
+                Model = currentCar.Model,
+                SerialNumber = currentCar.SerialNumber,
+                ReleaseYear = currentCar.ReleaseYear,
+                AssignedDriverId = currentCar.AssignedDriverId
+            };
+            var response = await Http.PutAsJsonAsync($"{carsUrl}/{currentCar.Id}", updateCar);
+            if (response.IsSuccessStatusCode)
+            {
+                ClearForm();
+                await LoadCarsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to update car: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to update car: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error updating car: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error updating car: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task DeleteCarAsync(int carId)
+    {
+        try
+        {
+            var response = await Http.DeleteAsync($"{carsUrl}/{carId}");
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadCarsAsync();
+            }
+            else
+            {
+                Snackbar.Add($"Failed to delete car: {response.StatusCode}", Severity.Error);
+                Console.WriteLine($"Failed to delete car: {response.StatusCode}", Severity.Error);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error deleting car: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error deleting car: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task ShowUpdForm(int carId)
+    {
+        isAdd = false;
+        var response = await Http.GetFromJsonAsync<Car>($"{carsUrl}/{carId}");
+        if (response != null) currentCar = response;
+    }
+
+    private void ClearForm()
+    {
+        isAdd = true;
+        currentCar = new Car() { Id = 0, Colour = "", Model = "", SerialNumber = "", ReleaseYear = DateTime.Now, AssignedDriverId = 0 };
+    }
+
+    private async Task HandleFormSubmit()
+    {
+        if (isAdd) await AddCarAsync();
+        else await UpdateCarAsync();
     }
 }

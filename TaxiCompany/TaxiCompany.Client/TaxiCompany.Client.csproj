@@ -6,7 +6,7 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
+	<ItemGroup>
     <PackageReference Include="Blazorise" Version="1.7.0" />
     <PackageReference Include="Blazorise.Bootstrap5" Version="1.7.0" />
     <PackageReference Include="Blazorise.Icons.FontAwesome" Version="1.7.0" />
@@ -21,6 +21,11 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+  </ItemGroup>
+  
+  <ItemGroup>
+	<ProjectReference Include="..\TaxiCompany.WebApi\TaxiCompany.WebApi.csproj" />
+	<ProjectReference Include="..\TaxiCompany.Domain\TaxiCompany.Domain.csproj" />
   </ItemGroup>
 
 </Project>

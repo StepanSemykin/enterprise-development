@@ -1,8 +1,10 @@
 using Blazorise;
 using Blazorise.Bootstrap5;
 using Blazorise.Icons.FontAwesome;
+using System.Net.NetworkInformation;
 using TaxiCompany.Client.Components;
-
+using TaxiCompany.WebApi;
+using TaxiCompany.Domain.Entities;
 using MudBlazor;
 using MudBlazor.Services;
 using Microsoft.AspNetCore.Components.Web;

@@ -4,14 +4,15 @@
 
 <PageTitle>Clients</PageTitle>
 
-<h1>Client management service</h1>
+<h1 class ="text-center">Client management service</h1>
 
-<table class="table table-striped">
+<table class="table table-striped w-100">
     <thead>
         <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Phone Number</th>
+            <th>Id</th>
+            <th>Full name</th>
+            <th>Phone number</th>
+            <th></th>
         </tr>
     </thead>
     <tbody>
@@ -26,10 +27,10 @@
             @foreach (var client in _clients)
             {
                 <tr>
-                    <td>@client.Id</td>
-                    <td>@client.FullName</td>
-                    <td>@client.PhoneNumber</td>
-                    <td>
+                    <td class="align-middle">@client.Id</td>
+                    <td class="align-middle">@client.FullName</td>
+                    <td class="align-middle">@client.PhoneNumber</td>
+                    <td class="text-center align-middle">
                         <button class="btn btn-primary" @onclick="@(() => ShowUpdForm(client.Id))">Edit</button>
                         <button class="btn btn-danger" @onclick="@(() => DeleteClientAsync(client.Id))">Delete</button>
                     </td>
@@ -39,19 +40,19 @@
     </tbody>
 </table>
 
-<h3>@(isAdd ? "Add New Client" : "Edit Client")</h3>
+<h3>@(isAdd ? "Add client" : "Edit client")</h3>
 
 <EditForm Model="@currentClient" OnValidSubmit="@HandleFormSubmit" FormName="ClientForm">
     <DataAnnotationsValidator />
     
     <div class="mb-3">
-        <label for="full-name" class="form-label">Full Name</label>
+        <label for="full-name" class="form-label">Full name</label>
         <InputText id="full-name" class="form-control" @bind-Value="currentClient.FullName" />
         <ValidationMessage For="@(() => currentClient.FullName)" />
     </div>
     
     <div class="mb-3">
-        <label for="phone-number" class="form-label">Phone Number</label>
+        <label for="phone-number" class="form-label">Phone number</label>
         <InputText id="phone-number" class="form-control" @bind-Value="currentClient.PhoneNumber" />
         <ValidationMessage For="@(() => currentClient.PhoneNumber)" />
     </div>
@@ -152,15 +153,6 @@
             if (response.IsSuccessStatusCode)
             {
                 await LoadClientsAsync();
-                // var routes = await Http.GetFromJsonAsync<List<Route>>(routeUrl);
-                // if (routes != null)
-                // {
-                //     routes = routes.Where(d => d.AssignedDriver.Id == driverId).ToList();
-                //     foreach (var route in routes)
-                //     {
-                //         await Http.DeleteAsync($"api/Routes/{route.Id}");
-                //     }
-                // }
             }
             else
             {

@@ -48,7 +48,7 @@ public class CarRepository(TaxiCompanyDbContext context) : IRepository<Car>
         oldCar.Colour = value.Colour;
         oldCar.Model = value.Model;
         oldCar.SerialNumber = value.SerialNumber;
-        oldCar.RealeseYear = value.RealeseYear;
+        oldCar.ReleaseYear = value.ReleaseYear;
         oldCar.AssignedDriverId = value.AssignedDriverId;
         await context.SaveChangesAsync();
 

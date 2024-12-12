@@ -44,9 +44,8 @@ public class Car
     /// Год выпуска
     /// </summary>
     [Column("release_year")]
-    [MaxLength(4)]
     [Required]
-    public required DateTime RealeseYear { get; set; }
+    public required DateTime ReleaseYear { get; set; }
 
     /// <summary>
     /// Идентификатор водителя

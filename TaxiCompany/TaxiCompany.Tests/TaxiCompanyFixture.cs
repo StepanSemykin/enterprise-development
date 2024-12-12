@@ -6,13 +6,13 @@ public class TaxiCompanyFixture
 {
     public List<Car> CarsList =
     [
-        new() {Id = 1, Colour = "Blue", Model = "Hyundai", SerialNumber = "111", RealeseYear = new DateTime(2019), AssignedDriverId = 1},
-        new() {Id = 2, Colour = "White", Model = "Volvo", SerialNumber = "123", RealeseYear = new DateTime(2010), AssignedDriverId = 2},
-        new() {Id = 3, Colour = "White", Model = "Toyota", SerialNumber = "231", RealeseYear = new DateTime(2012), AssignedDriverId = 3},
-        new() {Id = 4, Colour = "Yellow", Model = "Hyundai", SerialNumber = "943", RealeseYear = new DateTime(2023), AssignedDriverId = 4},
-        new() {Id = 5, Colour = "White", Model = "VAZ", SerialNumber = "874", RealeseYear = new DateTime(2022), AssignedDriverId = 5},
-        new() {Id = 6, Colour = "Red", Model = "BMW", SerialNumber = "456", RealeseYear = new DateTime(2019), AssignedDriverId = 6},
-        new() {Id = 7, Colour = "Black", Model = "Kia", SerialNumber = "911", RealeseYear = new DateTime(2018), AssignedDriverId = 7}
+        new() {Id = 1, Colour = "Blue", Model = "Hyundai", SerialNumber = "111", ReleaseYear = new DateTime(2019), AssignedDriverId = 1},
+        new() {Id = 2, Colour = "White", Model = "Volvo", SerialNumber = "123", ReleaseYear = new DateTime(2010), AssignedDriverId = 2},
+        new() {Id = 3, Colour = "White", Model = "Toyota", SerialNumber = "231", ReleaseYear = new DateTime(2012), AssignedDriverId = 3},
+        new() {Id = 4, Colour = "Yellow", Model = "Hyundai", SerialNumber = "943", ReleaseYear = new DateTime(2023), AssignedDriverId = 4},
+        new() {Id = 5, Colour = "White", Model = "VAZ", SerialNumber = "874", ReleaseYear = new DateTime(2022), AssignedDriverId = 5},
+        new() {Id = 6, Colour = "Red", Model = "BMW", SerialNumber = "456", ReleaseYear = new DateTime(2019), AssignedDriverId = 6},
+        new() {Id = 7, Colour = "Black", Model = "Kia", SerialNumber = "911", ReleaseYear = new DateTime(2018), AssignedDriverId = 7}
     ];
 
     public List<Client> ClientsList =

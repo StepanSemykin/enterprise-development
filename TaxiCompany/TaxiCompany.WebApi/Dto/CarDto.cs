@@ -20,7 +20,7 @@ public class CarDto
     /// <summary>
     /// Год выпуска
     /// </summary>
-    public required DateTime RealeseYear { get; set; }
+    public required DateTime ReleaseYear { get; set; }
 
     /// <summary>
     /// Идентификатор водителя
