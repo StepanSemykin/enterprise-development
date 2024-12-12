@@ -73,7 +73,13 @@
 
     <div class="mb-3">
         <label for="driver-id" class="form-label">Assigned driver</label>
-        <InputNumber id="driver-id" class="form-control" @bind-Value="currentCar.AssignedDriverId" />
+        <InputSelect id="driver-id" class="form-control" @bind-Value="currentCar.AssignedDriverId">
+            <option value="0">Select driver</option>
+            @foreach (var driver in _drivers)
+            {
+                <option value="@driver.Id">@driver.FullName</option>
+            }
+        </InputSelect>
     </div>
 
     <button type="submit" class="btn btn-success">Save</button>
@@ -83,13 +89,17 @@
 @code 
 {
     private List<Car> _cars = new();
+    private List<Driver> _drivers = new();
     private Car currentCar = new() { Id = 0, Colour = "", Model = "", SerialNumber = "", ReleaseYear = DateTime.Now, AssignedDriverId = 0 };
     private string carsUrl = "api/car";
+    private string driversUrl = "api/driver/free";
+
     private bool isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadCarsAsync();
+        await LoadDriversAsync();
     }
 
     private async Task LoadCarsAsync()
@@ -103,6 +113,19 @@
         {
             Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
             Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadDriversAsync()
+    {
+        try
+        {
+            _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading drivers: {ex.Message}");
         }
     }
 
@@ -124,6 +147,7 @@
             {
                 ClearForm();
                 await LoadCarsAsync();
+                await LoadDriversAsync();
             }
             else
             {

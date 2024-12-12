@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using TaxiCompany.Domain.Entities;
 using TaxiCompany.Domain.Repositories;
 using TaxiCompany.WebApi.Dto;
@@ -46,6 +47,25 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
         if (driver == null) return NotFound();
 
         return Ok(driver);
+    }
+
+    [HttpGet("free")]
+    [ProducesResponseType(typeof(IEnumerable<Driver>), 200)]
+    public async Task<IActionResult> GetFreeDrivers()
+    {
+        // Получаем список всех водителей
+        var drivers = await repository.GetAsync();
+
+        // Получаем список машин с назначенными водителями
+        var assignedDriverIds = (await repositoryCars.GetAsync())
+            .Where(car => car.AssignedDriverId != null)
+            .Select(car => car.AssignedDriverId)
+            .ToHashSet();
+
+        // Отбираем только тех водителей, которые не назначены
+        var freeDrivers = drivers.Where(driver => !assignedDriverIds.Contains(driver.Id));
+
+        return Ok(freeDrivers);
     }
 
     /// <summary>
