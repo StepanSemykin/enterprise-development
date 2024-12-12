@@ -80,15 +80,37 @@
         <InputNumber id="cost" class="form-control" @bind-Value="currentTrip.Cost" />
     </div>
 
-    <div class="mb-3">
+@*     <div class="mb-3">
         <label for="client-id" class="form-label">Assigned client</label>
         <InputNumber id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId" />
+    </div> *@
+
+    <div class="mb-3">
+        <label for="client-id" class="form-label">Assigned client</label>
+        <InputSelect id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId">
+            <option value="0">Select client</option>
+            @foreach (var client in _clients)
+            {
+                <option value="@client.Id">@client.FullName</option>
+            }
+        </InputSelect>
     </div>
 
     <div class="mb-3">
         <label for="car-id" class="form-label">Assigned car</label>
-        <InputNumber id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId" />
+        <InputSelect id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId">
+            <option value="0">Select car</option>
+            @foreach (var car in _cars)
+            {
+                <option value="@car.Id">@car.Model</option>
+            }
+        </InputSelect>
     </div>
+
+@*     <div class="mb-3">
+        <label for="car-id" class="form-label">Assigned car</label>
+        <InputNumber id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId" />
+    </div> *@
 
     <button type="submit" class="btn btn-success">Save</button>
     <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
@@ -97,13 +119,19 @@
 @code
 {
     private List<Trip> _trips = new();
+    private List<Car> _cars = new();
+    private List<Client> _clients = new();
     private Trip currentTrip = new() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
     private string tripsUrl = "api/trip";
+    private string carsUrl = "api/car";
+    private string clientsUrl = "api/client";
     private bool isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
         await LoadTripsAsync();
+        await LoadCarsAsync();
+        await LoadClientsAsync();
     }
 
     private async Task LoadTripsAsync()
@@ -117,6 +145,34 @@
         {
             Snackbar.Add($"Error loading trips: {ex.Message}", Severity.Error);
             Console.WriteLine($"Error loading trips: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadCarsAsync()
+    {
+        try
+        {
+            _cars = await Http.GetFromJsonAsync<List<Car>>(carsUrl) ?? new List<Car>();
+            Console.WriteLine($"Loaded cars: {_cars.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadClientsAsync()
+    {
+        try
+        {
+            _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
+            Console.WriteLine($"Loaded clients: {_clients.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading clients: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading clients: {ex.Message}", Severity.Error);
         }
     }
 
