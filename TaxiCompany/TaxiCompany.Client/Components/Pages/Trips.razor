@@ -80,11 +80,6 @@
         <InputNumber id="cost" class="form-control" @bind-Value="currentTrip.Cost" />
     </div>
 
-@*     <div class="mb-3">
-        <label for="client-id" class="form-label">Assigned client</label>
-        <InputNumber id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId" />
-    </div> *@
-
     <div class="mb-3">
         <label for="client-id" class="form-label">Assigned client</label>
         <InputSelect id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId">
@@ -106,11 +101,6 @@
             }
         </InputSelect>
     </div>
-
-@*     <div class="mb-3">
-        <label for="car-id" class="form-label">Assigned car</label>
-        <InputNumber id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId" />
-    </div> *@
 
     <button type="submit" class="btn btn-success">Save</button>
     <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>

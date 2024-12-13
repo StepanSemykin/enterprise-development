@@ -92,7 +92,7 @@
     private List<Driver> _drivers = new();
     private Car currentCar = new() { Id = 0, Colour = "", Model = "", SerialNumber = "", ReleaseYear = DateTime.Now, AssignedDriverId = 0 };
     private string carsUrl = "api/car";
-    private string driversUrl = "api/driver/free";
+    private string driversUrl = "api/driver";
 
     private bool isAdd = true;
 
@@ -120,8 +120,8 @@
     {
         try
         {
-            _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
-        }
+            _drivers = await Http.GetFromJsonAsync<List<Driver>>($"{driversUrl}/free") ?? new List<Driver>();
+    }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
