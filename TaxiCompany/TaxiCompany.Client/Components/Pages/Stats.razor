@@ -67,7 +67,7 @@
         </tbody>
     </table>
 }
-else if (!_clients.Any() && showClients)
+else if ((_clients != null && !_clients.Any()) && showClients)
 {
     <p>No clients found for the selected date range</p>
 }
@@ -86,16 +86,25 @@ else if (!_clients.Any() && showClients)
         <tbody>
             @foreach (var tripCount in _tripCounts)
             {
-                <tr>
-                    <td>@tripCount.Client.FullName</td>
-                    <td>@tripCount.Client.PhoneNumber</td>
-                    <td>@tripCount.TripCount</td>
-                </tr>
+                if (tripCount.Client != null)
+                {
+                    <tr>
+                        <td>@tripCount.Client.FullName</td>
+                        <td>@tripCount.Client.PhoneNumber</td>
+                        <td>@tripCount.TripCount</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">No client data available</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
-else if (!_tripCounts.Any() && showTripCounts)
+else if ((_tripCounts != null && !_tripCounts.Any()) && showTripCounts)
 {
     <p>No trip counts found</p>
 }
@@ -113,15 +122,24 @@ else if (!_tripCounts.Any() && showTripCounts)
         <tbody>
             @foreach (var driver in _topDrivers)
             {
-                <tr>
-                    <td>@driver.Driver.FullName</td>
-                    <td>@driver.TripCount</td>
-                </tr>
+                if (driver.Driver != null)
+                {
+                    <tr>
+                        <td>@driver.Driver.FullName</td>
+                        <td>@driver.TripCount</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="2">No driver data available</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
-else if (!_topDrivers.Any() && showTopDrivers)
+else if ((_topDrivers != null && !_topDrivers.Any()) && showTopDrivers)
 {
     <p>No top drivers found</p>
 }
@@ -141,17 +159,26 @@ else if (!_topDrivers.Any() && showTopDrivers)
         <tbody>
             @foreach (var driverStat in _driverStats)
             {
-                <tr>
-                    <td>@driverStat.Driver.FullName</td>
-                    <td>@driverStat.TripCount</td>
-                    <td>@driverStat.AverageDrivingTime</td>
-                    <td>@driverStat.MaxDrivingTime</td>
-                </tr>
+                if (driverStat.Driver != null)
+                {
+                    <tr>
+                        <td>@driverStat.Driver.FullName</td>
+                        <td>@driverStat.TripCount</td>
+                        <td>@driverStat.AverageDrivingTime</td>
+                        <td>@driverStat.MaxDrivingTime</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="4">No driver data available</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
-else if (!_driverStats.Any() && showDriverStats)
+else if ((_driverStats != null && !_driverStats.Any()) && showDriverStats)
 {
     <p>No driver stats found</p>
 }
@@ -170,16 +197,25 @@ else if (!_driverStats.Any() && showDriverStats)
         <tbody>
             @foreach (var client in _topClients)
             {
-                <tr>
-                    <td>@client.Client.FullName</td>
-                    <td>@client.Client.PhoneNumber</td>
-                    <td>@client.TripCount</td>
-                </tr>
+                if (client.Client != null)
+                {
+                    <tr>
+                        <td>@client.Client.FullName</td>
+                        <td>@client.Client.PhoneNumber</td>
+                        <td>@client.TripCount</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td colspan="3">No client data available</td>
+                    </tr>
+                }
             }
         </tbody>
     </table>
 }
-else if (!_topClients.Any() &&  showTopClients)
+else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
 {
     <p>No top clients found</p>
 }
@@ -294,7 +330,7 @@ else if (!_topClients.Any() &&  showTopClients)
         try
         {
             var url = $"{tripsUrl}/top-drivers";
-            _topDrivers = await Http.GetFromJsonAsync<List<DriverTripCountDto>>(url);
+            _topDrivers = await Http.GetFromJsonAsync<List<DriverTripCountDto>>(url) ?? new List<DriverTripCountDto>();
 
             showTopDrivers = true;
         }
@@ -342,7 +378,7 @@ else if (!_topClients.Any() &&  showTopClients)
         try
         {
             var url = $"{carsUrl}/driver/{formModel.driverId}";
-            driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url);
+            driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url) ?? new DriverCarInfoDto();
 
             showDriverCarInfo = true;
         }
