@@ -49,20 +49,22 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
         return Ok(driver);
     }
 
+    /// <summary>
+    /// Получает водителей без назначенных авто.
+    /// </summary>
+    /// <returns>
+    /// Возвращает результат операции, который содержит список водителей.
+    /// </returns>
     [HttpGet("free")]
     [ProducesResponseType(typeof(IEnumerable<Driver>), 200)]
     public async Task<IActionResult> GetFreeDrivers()
     {
-        // Получаем список всех водителей
         var drivers = await repository.GetAsync();
 
-        // Получаем список машин с назначенными водителями
         var assignedDriverIds = (await repositoryCars.GetAsync())
-            .Where(car => car.AssignedDriverId != null)
             .Select(car => car.AssignedDriverId)
             .ToHashSet();
 
-        // Отбираем только тех водителей, которые не назначены
         var freeDrivers = drivers.Where(driver => !assignedDriverIds.Contains(driver.Id));
 
         return Ok(freeDrivers);
@@ -120,7 +122,6 @@ public class DriverController(IRepository<Driver> repository, IRepository<Car> r
         var driver = await repository.GetAsync(id);
         if (driver == null) return NotFound($"Driver with ID {id} not found.");
         var car = await repositoryCars.GetAsync(driver.AssignedCarId);
-        //if (car == null) return BadRequest($"Car with ID {driver.AssignedCarId} not found.");
         if (car != null)
         {
             car.AssignedDriverId = 0;
