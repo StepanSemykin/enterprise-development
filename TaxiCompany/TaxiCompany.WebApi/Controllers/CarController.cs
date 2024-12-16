@@ -98,17 +98,26 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
         if (oldValue.AssignedDriverId != value.AssignedDriverId)
         {
             var driver = await repositoryDrivers.GetAsync(oldValue.AssignedDriverId);
-            if (driver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
-            driver.AssignedCarId = 0;
-            await repositoryDrivers.PutAsync(driver.Id, driver);
+            if (driver != null)
+            {
+                driver.AssignedCarId = 0;
+                await repositoryDrivers.PutAsync(driver.Id, driver);
+            }
             var newDriver = await repositoryDrivers.GetAsync(value.AssignedDriverId);
             if (newDriver == null) return BadRequest($"Driver with ID {oldValue.AssignedDriverId} was not found.");
             var car = await repository.GetAsync(newDriver.AssignedCarId);
-            if (car == null) return BadRequest($"Car with ID {newDriver.AssignedCarId} was not found.");
-            car.AssignedDriverId = 0;
-            await repository.PutAsync(car.Id, car);
-            newDriver.AssignedCarId = id;
-            await repositoryDrivers.PutAsync(newDriver.Id, newDriver);
+            if (car != null)
+            {
+                car.AssignedDriverId = 0;
+                await repository.PutAsync(car.Id, car);
+                newDriver.AssignedCarId = id;
+                await repositoryDrivers.PutAsync(newDriver.Id, newDriver);
+            }
+            //if (car == null) return BadRequest($"Car with ID {newDriver.AssignedCarId} was not found.");
+            //car.AssignedDriverId = 0;
+            //await repository.PutAsync(car.Id, car);
+            //newDriver.AssignedCarId = id;
+            //await repositoryDrivers.PutAsync(newDriver.Id, newDriver);
         };
 
         if (await repository.PutAsync(id, value)) return Ok();

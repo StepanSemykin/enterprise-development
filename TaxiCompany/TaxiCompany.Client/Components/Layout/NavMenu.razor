@@ -8,29 +8,37 @@
 
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="flex-column">
+
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="cars">
+            <NavLink class="nav-link" href="cars" Match="NavLinkMatch.All">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Cars
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="clients">
+            <NavLink class="nav-link" href="clients" Match="NavLinkMatch.All">
                 <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Clients
             </NavLink>
         </div>
 
         <div class="nav-item px-3">
-            <NavLink class="nav-link" href="drivers">
-                <span class="bi bi-plus-square-fill-nav-menu" aria-hidden="true"></span> Drivers
+            <NavLink class="nav-link" href="drivers" Match="NavLinkMatch.All">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Drivers
             </NavLink>
         </div>    
 
         <div class="nav-item px-3">
             <NavLink class="nav-link" href="trips" Match="NavLinkMatch.All">
-                <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Trips
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Trips
             </NavLink>
         </div>
+
+        <div class="nav-item px-3">
+            <NavLink class="nav-link" href="stats" Match="NavLinkMatch.All">
+                <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Stats
+            </NavLink>
+        </div>
+
     </nav>
 </div>
 

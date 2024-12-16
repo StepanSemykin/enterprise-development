@@ -1,0 +1,416 @@
+﻿@page "/stats"
+@inject HttpClient Http
+@inject ISnackbar Snackbar
+
+<PageTitle>Stats</PageTitle>
+
+<h1 class="text-center">Statistics</h1>
+
+<EditForm Model="@formModel" FormName="StatsForm">
+    <DataAnnotationsValidator />
+
+    <div class="mb-3">
+        <label for="start-date" class="form-label">Start date</label>
+        <InputDate id="start-date" class="form-control" @bind-Value="formModel.startDate" />
+        <ValidationMessage For="@(() => formModel.startDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="end-date" class="form-label">End date</label>
+        <InputDate id="end-date" class="form-control" @bind-Value="formModel.endDate" />
+        <ValidationMessage For="@(() => formModel.endDate)" />
+    </div>
+
+    <div class="mb-3">
+        <label for="driver-id" class="form-label">Driver</label>
+        <InputSelect id="driver-id" class="form-control" @bind-Value="formModel.driverId">
+            <option value="0">Select driver</option>
+            @foreach (var driver in _drivers)
+            {
+                <option value="@driver.Id">@driver.FullName</option>
+            }
+        </InputSelect>
+    </div>
+
+    <div class="mt-3">
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadClientsStatsAsync())">Load clients stats</button>
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadTripCountsAsync())">Load trip counts</button>
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadTopDriversAsync())">Load top drivers</button>
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadDriverTripStatsAsync())">Load driver trip stats</button>
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadTopClientsAsync())">Load top clients</button>
+        <button class="btn btn-secondary" type="button" @onclick="@(() => LoadDriverAndCarInfo())">Load driver and car info</button>
+        <button class="btn btn-secondary" type="button" @onclick="ClearForm">Clear</button>
+    </div>
+
+</EditForm>
+
+@if (_clients != null && _clients.Any())
+{
+    <h3 class="mt-4">Loaded Clients</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>FullName</th>
+                <th>PhoneNumber</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in _clients)
+            {
+                <tr>
+                    <td>@client.Id</td>
+                    <td>@client.FullName</td>
+                    <td>@client.PhoneNumber</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!_clients.Any() && showClients)
+{
+    <p>No clients found for the selected date range</p>
+}
+
+@if (_tripCounts != null && _tripCounts.Any())
+{
+    <h3 class="mt-4">Trip counts</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full name</th>
+                <th>Phone number</th>
+                <th>Trip count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var tripCount in _tripCounts)
+            {
+                <tr>
+                    <td>@tripCount.Client.FullName</td>
+                    <td>@tripCount.Client.PhoneNumber</td>
+                    <td>@tripCount.TripCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!_tripCounts.Any() && showTripCounts)
+{
+    <p>No trip counts found</p>
+}
+
+@if (_topDrivers != null && _topDrivers.Any())
+{
+    <h3 class="mt-4">Top drivers</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full name</th>
+                <th>Trip count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var driver in _topDrivers)
+            {
+                <tr>
+                    <td>@driver.Driver.FullName</td>
+                    <td>@driver.TripCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!_topDrivers.Any() && showTopDrivers)
+{
+    <p>No top drivers found</p>
+}
+
+@if (_driverStats != null && _driverStats.Any())
+{
+    <h3 class="mt-4">Driver trip stats</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full name</th>
+                <th>Trip count</th>
+                <th>Average driving time</th>
+                <th>Max driving time</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var driverStat in _driverStats)
+            {
+                <tr>
+                    <td>@driverStat.Driver.FullName</td>
+                    <td>@driverStat.TripCount</td>
+                    <td>@driverStat.AverageDrivingTime</td>
+                    <td>@driverStat.MaxDrivingTime</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!_driverStats.Any() && showDriverStats)
+{
+    <p>No driver stats found</p>
+}
+
+@if (_topClients != null && _topClients.Any())
+{
+    <h3 class="mt-4">Top clients</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Full name</th>
+                <th>Phone number</th>
+                <th>Trip count</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var client in _topClients)
+            {
+                <tr>
+                    <td>@client.Client.FullName</td>
+                    <td>@client.Client.PhoneNumber</td>
+                    <td>@client.TripCount</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else if (!_topClients.Any() &&  showTopClients)
+{
+    <p>No top clients found</p>
+}
+
+@if (driverCarInfo != null && driverCarInfo.Driver != null && driverCarInfo.Car != null)
+ {
+     <h3 class="mt-4">Driver and car info</h3>
+     <table class="table">
+         <thead>
+             <tr>
+                 <th>Full name</th>
+                 <th>Car model</th>
+                 <th>Car colour</th>
+                 <th>Serial number</th>
+                 <th>Release year</th>
+             </tr>
+         </thead>
+         <tbody>
+             <tr>
+                 <td>@driverCarInfo.Driver.FullName</td>
+                 <td>@driverCarInfo.Car.Model</td>
+                 <td>@driverCarInfo.Car.Colour</td>
+                 <td>@driverCarInfo.Car.SerialNumber</td>
+                <td>@driverCarInfo.Car.ReleaseYear.ToString("dd-MM-yyyy")</td>
+             </tr>
+         </tbody>
+     </table>
+ }
+ else if (driverCarInfo == null && showDriverCarInfo)
+ {
+     <p>No driver and car info found</p>
+ }
+
+@code 
+{
+    private List<Client> _clients = new();
+    private List<ClientTripCountDto> _tripCounts = new();
+    private List<DriverTripCountDto> _topDrivers = new();
+    private List<DriverTripStatsDto> _driverStats = new();
+    private List<ClientTripCountDto> _topClients = new();
+    private DriverCarInfoDto driverCarInfo = new();
+    private List<Driver> _drivers = new();
+    // private int driverId = 0;
+
+    private DateTime startDate = DateTime.Now;
+    private DateTime endDate = DateTime.Now;
+
+    private string tripsUrl = "api/trip";
+    private string carsUrl = "api/car";
+    private string driversUrl = "api/driver";
+
+    private bool showClients = false;
+    private bool showTripCounts = false;
+    private bool showTopDrivers = false;
+    private bool showDriverStats = false;
+    private bool showTopClients = false;
+    private bool showDriverCarInfo = false;
+
+    private StatsFormModel formModel = new();
+    // private DriverFormModel driverFormModel = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDriversAsync();
+    }
+
+    private async Task LoadDriversAsync()
+    {
+        Console.WriteLine($"Loading drivers: {_drivers.Count()}");
+        try
+        {
+            _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
+
+            Console.WriteLine($"Loaded drivers: {_drivers.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading drivers: {ex.Message}");
+        }
+    }
+
+    private async Task LoadClientsStatsAsync()
+    {
+        try
+        {
+            DateTime? startDate = formModel.startDate;
+            DateTime? endDate = formModel.endDate;
+
+            Console.WriteLine($"StartDate: {startDate}, EndDate: {endDate}");
+            var url = $"{tripsUrl}/passengers?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
+            _clients = await Http.GetFromJsonAsync<List<Client>>(url) ?? new List<Client>();
+            showClients = true;
+            Console.WriteLine($"Loaded clients: {_clients.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadTripCountsAsync()
+    {
+        try
+        {
+            var url = $"{tripsUrl}/trip-counts";
+            _tripCounts = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
+
+            showTripCounts = true;
+
+            if (_tripCounts.Any())
+            {
+                Snackbar.Add("Trip counts loaded successfully!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("No trip counts found.", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading trip counts: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading trip counts: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadTopDriversAsync()
+    {
+        try
+        {
+            var url = $"{tripsUrl}/top-drivers";
+            _topDrivers = await Http.GetFromJsonAsync<List<DriverTripCountDto>>(url);
+
+            showTopDrivers = true;
+
+            if (_topDrivers.Any())
+            {
+                Snackbar.Add("Top drivers loaded successfully!", Severity.Success);
+                foreach (var driver in _topDrivers)
+                {
+                    Console.WriteLine($"Driver: {driver.Driver.FullName}, Trips: {driver.TripCount}");
+                }
+            }
+            else
+            {
+                Snackbar.Add("No top drivers found.", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading top drivers: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading top drivers: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadDriverTripStatsAsync()
+    {
+        try
+        {
+            var url = $"{tripsUrl}/driver-trip-stats";
+            _driverStats = await Http.GetFromJsonAsync<List<DriverTripStatsDto>>(url) ?? new List<DriverTripStatsDto>();
+
+            showDriverStats = true;
+
+            if (_driverStats.Any())
+            {
+                Snackbar.Add("Driver trip stats loaded successfully!", Severity.Success);
+            }
+            else
+            {
+                Snackbar.Add("No driver trip stats found.", Severity.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading driver stats: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading driver stats: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadTopClientsAsync()
+    {
+        try
+        {
+            DateTime? startDate = formModel.startDate;
+            DateTime? endDate = formModel.endDate;
+
+            var url = $"{tripsUrl}/top-clients?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
+            Console.WriteLine($"StartDate: {startDate}, EndDate: {endDate}");
+            _topClients = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
+
+            showTopClients = true;
+            Console.WriteLine($"Loaded top clients: {_topClients.Count()}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading top clients: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading top clients: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private async Task LoadDriverAndCarInfo()
+    {
+        try
+        {
+            Console.WriteLine($"Driver Id: {formModel.driverId}");
+            var url = $"{carsUrl}/driver/{formModel.driverId}";
+            driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url);
+
+            showDriverCarInfo = true;
+
+            Console.WriteLine($"Loaded driver: {driverCarInfo.Driver.FullName}");
+            Console.WriteLine($"Loaded car: {driverCarInfo.Car.Model}");
+        }
+        catch (Exception ex)
+        {
+            Snackbar.Add($"Error loading driver and car info: {ex.Message}", Severity.Error);
+            Console.WriteLine($"Error loading driver and car info: {ex.Message}", Severity.Error);
+        }
+    }
+
+    private void ClearForm()
+    {
+        formModel = new();
+    }
+
+    private class StatsFormModel
+    {
+        public DateTime? startDate { get; set; }
+        public DateTime? endDate { get; set; }
+        public int driverId { get; set; }
+    }
+}

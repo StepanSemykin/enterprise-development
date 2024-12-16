@@ -139,9 +139,9 @@ public class TripController(IRepository<Trip> repository, IRepository<Client> re
         var clients = await repositoryClients.GetAsync();
 
         var sortedClients = clients
-        .Where(client => clientIds.Contains(client.Id))
-        .OrderBy(client => client.FullName)
-        .ToList();
+            .Where(client => clientIds.Contains(client.Id))
+            .OrderBy(client => client.FullName)
+            .ToList();
 
         return Ok(sortedClients);
     }
