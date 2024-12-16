@@ -46,24 +46,24 @@
     </tbody>
 </table>
 
-<h3>@(isAdd ? "Add driver" : "Edit driver")</h3>
+<h3>@(_isAdd ? "Add driver" : "Edit driver")</h3>
 
-<EditForm Model="@currentDriver" OnValidSubmit=@HandleFormSubmit FormName="DriverForm">
+<EditForm Model="@_currentDriver" OnValidSubmit=@HandleFormSubmit FormName="DriverForm">
     <div class="mb-3">
         <label for="full-name" class="form-label">Full name</label>
-        <InputText id="full-name" class="form-control" @bind-Value="currentDriver.FullName" />
+        <InputText id="full-name" class="form-control" @bind-Value="_currentDriver.FullName" />
     </div>
     <div class="mb-3">
         <label for="phone-number" class="form-label">Phone number</label>
-        <InputText id="phone-number" class="form-control" @bind-Value="currentDriver.PhoneNumber" />
+        <InputText id="phone-number" class="form-control" @bind-Value="_currentDriver.PhoneNumber" />
     </div>
     <div class="mb-3">
         <label for="passport" class="form-label">Passport</label>
-        <InputText id="passport" class="form-control" @bind-Value="currentDriver.Passport" />
+        <InputText id="passport" class="form-control" @bind-Value="_currentDriver.Passport" />
     </div>
     <div class="mb-3">
         <label for="address" class="form-label">Address</label>
-        <InputText id="address" class="form-control" @bind-Value="currentDriver.Address" />
+        <InputText id="address" class="form-control" @bind-Value="_currentDriver.Address" />
     </div>
     <button type="submit" class="btn btn-success">Save</button>
     <button type="button" class="btn btn-secondary" @onclick="ClearForm">Cancel</button>
@@ -72,9 +72,11 @@
 @code 
 {
     private List<Driver> _drivers = new();
-    private Driver currentDriver = new() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
-    private string driversUrl = "api/driver";
-    private bool isAdd = true;
+    private Driver _currentDriver = new() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
+
+    private string _driversUrl = "api/driver";
+
+    private bool _isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -85,7 +87,7 @@
     {
         try
         {
-            _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
+            _drivers = await Http.GetFromJsonAsync<List<Driver>>(_driversUrl) ?? new List<Driver>();
         }
         catch (Exception ex)
         {
@@ -99,12 +101,12 @@
         {
             var addDriver = new DriverDto
             {
-                FullName = currentDriver.FullName,
-                PhoneNumber = currentDriver.PhoneNumber,
-                Passport = currentDriver.Passport,
-                Address = currentDriver.Address
+                FullName = _currentDriver.FullName,
+                PhoneNumber = _currentDriver.PhoneNumber,
+                Passport = _currentDriver.Passport,
+                Address = _currentDriver.Address
             };
-            var response = await Http.PostAsJsonAsync(driversUrl, addDriver);
+            var response = await Http.PostAsJsonAsync(_driversUrl, addDriver);
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -127,12 +129,12 @@
         {
             var updateDriver = new DriverDto
             {
-                FullName = currentDriver.FullName,
-                PhoneNumber = currentDriver.PhoneNumber,
-                Passport = currentDriver.Passport,
-                Address = currentDriver.Address
+                FullName = _currentDriver.FullName,
+                PhoneNumber = _currentDriver.PhoneNumber,
+                Passport = _currentDriver.Passport,
+                Address = _currentDriver.Address
             };
-            var response = await Http.PutAsJsonAsync($"{driversUrl}/{currentDriver.Id}", updateDriver);
+            var response = await Http.PutAsJsonAsync($"{_driversUrl}/{_currentDriver.Id}", updateDriver);
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -153,7 +155,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"{driversUrl}/{driverId}");
+            var response = await Http.DeleteAsync($"{_driversUrl}/{driverId}");
             if (response.IsSuccessStatusCode)
             {
                 await LoadDriversAsync();
@@ -171,20 +173,20 @@
 
     private async Task ShowUpdForm(int driverId)
     {
-        isAdd = false;
-        var response = await Http.GetFromJsonAsync<Driver>($"{driversUrl}/{driverId}");
-        if (response != null) currentDriver = response;
+        _isAdd = false;
+        var response = await Http.GetFromJsonAsync<Driver>($"{_driversUrl}/{driverId}");
+        if (response != null) _currentDriver = response;
     }
 
     private void ClearForm()
     {
-        isAdd = true;
-        currentDriver = new Driver() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
+        _isAdd = true;
+        _currentDriver = new Driver() { Id = 0, FullName = "", PhoneNumber = "", Address = "", Passport = "", AssignedCarId = 0};
     }
 
     private async Task HandleFormSubmit()
     {
-        if (isAdd) await AddDriverAsync();
+        if (_isAdd) await AddDriverAsync();
         else await UpdateDriverAsync();
     }
 }

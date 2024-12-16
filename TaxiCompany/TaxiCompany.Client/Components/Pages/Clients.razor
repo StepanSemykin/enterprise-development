@@ -40,21 +40,21 @@
     </tbody>
 </table>
 
-<h3>@(isAdd ? "Add client" : "Edit client")</h3>
+<h3>@(_isAdd ? "Add client" : "Edit client")</h3>
 
-<EditForm Model="@currentClient" OnValidSubmit="@HandleFormSubmit" FormName="ClientForm">
+<EditForm Model="@_currentClient" OnValidSubmit="@HandleFormSubmit" FormName="ClientForm">
     <DataAnnotationsValidator />
     
     <div class="mb-3">
         <label for="full-name" class="form-label">Full name</label>
-        <InputText id="full-name" class="form-control" @bind-Value="currentClient.FullName" />
-        <ValidationMessage For="@(() => currentClient.FullName)" />
+        <InputText id="full-name" class="form-control" @bind-Value="_currentClient.FullName" />
+        <ValidationMessage For="@(() => _currentClient.FullName)" />
     </div>
     
     <div class="mb-3">
         <label for="phone-number" class="form-label">Phone number</label>
-        <InputText id="phone-number" class="form-control" @bind-Value="currentClient.PhoneNumber" />
-        <ValidationMessage For="@(() => currentClient.PhoneNumber)" />
+        <InputText id="phone-number" class="form-control" @bind-Value="_currentClient.PhoneNumber" />
+        <ValidationMessage For="@(() => _currentClient.PhoneNumber)" />
     </div>
 
     <button type="submit" class="btn btn-success">Save</button>
@@ -64,9 +64,11 @@
 @code 
 {
     private List<Client> _clients = new();
-    private Client currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
-    private string clientsUrl = "api/client";
-    private bool isAdd = true;
+    private Client _currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
+
+    private string _clientsUrl = "api/client";
+
+    private bool _isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -77,7 +79,7 @@
     {
         try
         {
-            _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
+            _clients = await Http.GetFromJsonAsync<List<Client>>(_clientsUrl) ?? new List<Client>();
         }
         catch (Exception ex)
         {
@@ -91,10 +93,10 @@
         {
             var addClient = new ClientDto
             {
-                FullName = currentClient.FullName,
-                PhoneNumber = currentClient.PhoneNumber
+                FullName = _currentClient.FullName,
+                PhoneNumber = _currentClient.PhoneNumber
             };
-            var response = await Http.PostAsJsonAsync(clientsUrl, addClient);
+            var response = await Http.PostAsJsonAsync(_clientsUrl, addClient);
 
             if (response.IsSuccessStatusCode)
             {
@@ -118,10 +120,10 @@
         {
             var updateClient = new ClientDto
             {
-                FullName = currentClient.FullName,
-                PhoneNumber = currentClient.PhoneNumber
+                FullName = _currentClient.FullName,
+                PhoneNumber = _currentClient.PhoneNumber
             };
-            var response = await Http.PutAsJsonAsync($"{clientsUrl}/{currentClient.Id}", updateClient);
+            var response = await Http.PutAsJsonAsync($"{_clientsUrl}/{_currentClient.Id}", updateClient);
 
             if (response.IsSuccessStatusCode)
             {
@@ -143,7 +145,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"{clientsUrl}/{clientId}");
+            var response = await Http.DeleteAsync($"{_clientsUrl}/{clientId}");
             if (response.IsSuccessStatusCode)
             {
                 await LoadClientsAsync();
@@ -161,21 +163,21 @@
 
     private async Task ShowUpdForm(int clientId)
     {
-        isAdd = false;
+        _isAdd = false;
 
-        var response = await Http.GetFromJsonAsync<Client>($"{clientsUrl}/{clientId}");
-        if (response != null) currentClient = response;
+        var response = await Http.GetFromJsonAsync<Client>($"{_clientsUrl}/{clientId}");
+        if (response != null) _currentClient = response;
     }
 
     private void ClearForm()
     {
-        isAdd = true;
-        currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
+        _isAdd = true;
+        _currentClient = new() { Id = 0, FullName = "", PhoneNumber = "" };
     }
 
     private async Task HandleFormSubmit()
     {
-        if (isAdd) await AddClientAsync();
+        if (_isAdd) await AddClientAsync();
         else await UpdateClientAsync();
     }
 }

@@ -50,39 +50,39 @@
     </tbody>
 </table>
 
-<h3>@(isAdd ? "Add trip" : "Edit trip")</h3>
+<h3>@(_isAdd ? "Add trip" : "Edit trip")</h3>
 
-<EditForm Model="@currentTrip" OnValidSubmit=@HandleFormSubmit FormName="TripForm">
+<EditForm Model="@_currentTrip" OnValidSubmit=@HandleFormSubmit FormName="TripForm">
     <DataAnnotationsValidator />
 
     <div class="mb-3">
         <label for="departure" class="form-label">Departure</label>
-        <InputText id="departure" class="form-control" @bind-Value="currentTrip.Departure" />
+        <InputText id="departure" class="form-control" @bind-Value="_currentTrip.Departure" />
     </div>
 
     <div class="mb-3">
         <label for="destination" class="form-label">Destination</label>
-        <InputText id="destination" class="form-control" @bind-Value="currentTrip.Destination" />
+        <InputText id="destination" class="form-control" @bind-Value="_currentTrip.Destination" />
     </div>
 
     <div class="mb-3">
         <label for="date" class="form-label">Date</label>
-        <InputDate Type="InputDateType.Date" id="date" class="form-control" @bind-Value="currentTrip.Date" />
+        <InputDate Type="InputDateType.Date" id="date" class="form-control" @bind-Value="_currentTrip.Date" />
     </div>
 
     <div class="mb-3">
         <label for="driving-time" class="form-label">Driving time</label>
-        <InputDate Type="InputDateType.Time" id="driving-time" class="form-control" @bind-Value="currentTrip.DrivingTime" />
+        <InputDate Type="InputDateType.Time" id="driving-time" class="form-control" @bind-Value="_currentTrip.DrivingTime" />
     </div>
 
     <div class="mb-3">
         <label for="cost" class="form-label">Cost</label>
-        <InputNumber id="cost" class="form-control" @bind-Value="currentTrip.Cost" />
+        <InputNumber id="cost" class="form-control" @bind-Value="_currentTrip.Cost" />
     </div>
 
     <div class="mb-3">
         <label for="client-id" class="form-label">Assigned client</label>
-        <InputSelect id="client-id" class="form-control" @bind-Value="currentTrip.AssignedClientId">
+        <InputSelect id="client-id" class="form-control" @bind-Value="_currentTrip.AssignedClientId">
             <option value="0">Select client</option>
             @foreach (var client in _clients)
             {
@@ -93,7 +93,7 @@
 
     <div class="mb-3">
         <label for="car-id" class="form-label">Assigned car</label>
-        <InputSelect id="car-id" class="form-control" @bind-Value="currentTrip.AssignedCarId">
+        <InputSelect id="car-id" class="form-control" @bind-Value="_currentTrip.AssignedCarId">
             <option value="0">Select car</option>
             @foreach (var car in _cars)
             {
@@ -111,11 +111,13 @@
     private List<Trip> _trips = new();
     private List<Car> _cars = new();
     private List<Client> _clients = new();
-    private Trip currentTrip = new() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
-    private string tripsUrl = "api/trip";
-    private string carsUrl = "api/car";
-    private string clientsUrl = "api/client";
-    private bool isAdd = true;
+    private Trip _currentTrip = new() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
+
+    private string _tripsUrl = "api/trip";
+    private string _carsUrl = "api/car";
+    private string _clientsUrl = "api/client";
+
+    private bool _isAdd = true;
 
     protected override async Task OnInitializedAsync()
     {
@@ -128,7 +130,7 @@
     {
         try
         {
-            _trips = await Http.GetFromJsonAsync<List<Trip>>(tripsUrl) ?? new List<Trip>();
+            _trips = await Http.GetFromJsonAsync<List<Trip>>(_tripsUrl) ?? new List<Trip>();
         }
         catch (Exception ex)
         {
@@ -140,7 +142,7 @@
     {
         try
         {
-            _cars = await Http.GetFromJsonAsync<List<Car>>(carsUrl) ?? new List<Car>();
+            _cars = await Http.GetFromJsonAsync<List<Car>>(_carsUrl) ?? new List<Car>();
         }
         catch (Exception ex)
         {
@@ -152,7 +154,7 @@
     {
         try
         {
-            _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
+            _clients = await Http.GetFromJsonAsync<List<Client>>(_clientsUrl) ?? new List<Client>();
         }
         catch (Exception ex)
         {
@@ -166,16 +168,16 @@
         {
             var addTrip = new TripDto
             {
-                Departure = currentTrip.Departure,
-                Destination = currentTrip.Destination,
-                Date = currentTrip.Date.ToUniversalTime(),
-                DrivingTime = currentTrip.DrivingTime,
-                Cost = currentTrip.Cost,
-                AssignedClientId = currentTrip.AssignedClientId,
-                AssignedCarId = currentTrip.AssignedCarId
+                Departure = _currentTrip.Departure,
+                Destination = _currentTrip.Destination,
+                Date = _currentTrip.Date.ToUniversalTime(),
+                DrivingTime = _currentTrip.DrivingTime,
+                Cost = _currentTrip.Cost,
+                AssignedClientId = _currentTrip.AssignedClientId,
+                AssignedCarId = _currentTrip.AssignedCarId
             };
 
-            var response = await Http.PostAsJsonAsync(tripsUrl, addTrip);
+            var response = await Http.PostAsJsonAsync(_tripsUrl, addTrip);
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -198,16 +200,16 @@
         {
             var updateTrip = new TripDto
             {
-                Departure = currentTrip.Departure,
-                Destination = currentTrip.Destination,
-                Date = currentTrip.Date,
-                DrivingTime = currentTrip.DrivingTime,
-                Cost = currentTrip.Cost,
-                AssignedClientId = currentTrip.AssignedClientId,
-                AssignedCarId = currentTrip.AssignedCarId
+                Departure = _currentTrip.Departure,
+                Destination = _currentTrip.Destination,
+                Date = _currentTrip.Date,
+                DrivingTime = _currentTrip.DrivingTime,
+                Cost = _currentTrip.Cost,
+                AssignedClientId = _currentTrip.AssignedClientId,
+                AssignedCarId = _currentTrip.AssignedCarId
             };
 
-            var response = await Http.PutAsJsonAsync($"{tripsUrl}/{currentTrip.Id}", updateTrip);
+            var response = await Http.PutAsJsonAsync($"{_tripsUrl}/{_currentTrip.Id}", updateTrip);
             if (response.IsSuccessStatusCode)
             {
                 ClearForm();
@@ -228,7 +230,7 @@
     {
         try
         {
-            var response = await Http.DeleteAsync($"{tripsUrl}/{tripId}");
+            var response = await Http.DeleteAsync($"{_tripsUrl}/{tripId}");
             if (response.IsSuccessStatusCode)
             {
                 await LoadTripsAsync();
@@ -246,20 +248,20 @@
 
     private async Task ShowUpdForm(int tripId)
     {
-        isAdd = false;
-        var response = await Http.GetFromJsonAsync<Trip>($"{tripsUrl}/{tripId}");
-        if (response != null) currentTrip = response;
+        _isAdd = false;
+        var response = await Http.GetFromJsonAsync<Trip>($"{_tripsUrl}/{tripId}");
+        if (response != null) _currentTrip = response;
     }
 
     private void ClearForm()
     {
-        isAdd = true;
-        currentTrip = new Trip() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
+        _isAdd = true;
+        _currentTrip = new Trip() { Id = 0, Departure = "", Destination = "", Date = DateTime.Now, DrivingTime = TimeOnly.MinValue, Cost = 0m, AssignedClientId = 0, AssignedCarId = 0 };
     }
 
     private async Task HandleFormSubmit()
     {
-        if (isAdd) await AddTripAsync();
+        if (_isAdd) await AddTripAsync();
         else await UpdateTripAsync();
     }
 }

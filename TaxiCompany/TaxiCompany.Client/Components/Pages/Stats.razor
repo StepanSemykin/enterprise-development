@@ -67,7 +67,7 @@
         </tbody>
     </table>
 }
-else if ((_clients != null && !_clients.Any()) && showClients)
+else if ((_clients != null && !_clients.Any()) && _showClients)
 {
     <p>No clients found for the selected date range</p>
 }
@@ -104,7 +104,7 @@ else if ((_clients != null && !_clients.Any()) && showClients)
         </tbody>
     </table>
 }
-else if ((_tripCounts != null && !_tripCounts.Any()) && showTripCounts)
+else if ((_tripCounts != null && !_tripCounts.Any()) && _showTripCounts)
 {
     <p>No trip counts found</p>
 }
@@ -139,7 +139,7 @@ else if ((_tripCounts != null && !_tripCounts.Any()) && showTripCounts)
         </tbody>
     </table>
 }
-else if ((_topDrivers != null && !_topDrivers.Any()) && showTopDrivers)
+else if ((_topDrivers != null && !_topDrivers.Any()) && _showTopDrivers)
 {
     <p>No top drivers found</p>
 }
@@ -178,7 +178,7 @@ else if ((_topDrivers != null && !_topDrivers.Any()) && showTopDrivers)
         </tbody>
     </table>
 }
-else if ((_driverStats != null && !_driverStats.Any()) && showDriverStats)
+else if ((_driverStats != null && !_driverStats.Any()) && _showDriverStats)
 {
     <p>No driver stats found</p>
 }
@@ -215,12 +215,12 @@ else if ((_driverStats != null && !_driverStats.Any()) && showDriverStats)
         </tbody>
     </table>
 }
-else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
+else if ((_topClients != null && !_topClients.Any()) &&  _showTopClients)
 {
     <p>No top clients found</p>
 }
 
-@if (driverCarInfo != null && driverCarInfo.Driver != null && driverCarInfo.Car != null)
+@if (_driverCarInfo != null && _driverCarInfo.Driver != null && _driverCarInfo.Car != null)
  {
      <h3 class="mt-4">Driver and car info</h3>
      <table class="table">
@@ -235,16 +235,16 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
          </thead>
          <tbody>
              <tr>
-                 <td>@driverCarInfo.Driver.FullName</td>
-                 <td>@driverCarInfo.Car.Model</td>
-                 <td>@driverCarInfo.Car.Colour</td>
-                 <td>@driverCarInfo.Car.SerialNumber</td>
-                <td>@driverCarInfo.Car.ReleaseYear.ToString("dd-MM-yyyy")</td>
+                 <td>@_driverCarInfo.Driver.FullName</td>
+                 <td>@_driverCarInfo.Car.Model</td>
+                 <td>@_driverCarInfo.Car.Colour</td>
+                 <td>@_driverCarInfo.Car.SerialNumber</td>
+                <td>@_driverCarInfo.Car.ReleaseYear.ToString("dd-MM-yyyy")</td>
              </tr>
          </tbody>
      </table>
  }
- else if (driverCarInfo == null && showDriverCarInfo)
+ else if (_driverCarInfo == null && _showDriverCarInfo)
  {
      <p>No driver and car info found</p>
  }
@@ -256,22 +256,22 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     private List<DriverTripCountDto> _topDrivers = new();
     private List<DriverTripStatsDto> _driverStats = new();
     private List<ClientTripCountDto> _topClients = new();
-    private DriverCarInfoDto driverCarInfo = new();
+    private DriverCarInfoDto _driverCarInfo = new();
     private List<Driver> _drivers = new();
 
-    private DateTime startDate = DateTime.Now;
-    private DateTime endDate = DateTime.Now;
+    private DateTime _startDate = DateTime.Now;
+    private DateTime _endDate = DateTime.Now;
 
-    private string tripsUrl = "api/trip";
-    private string carsUrl = "api/car";
-    private string driversUrl = "api/driver";
+    private string _tripsUrl = "api/trip";
+    private string _carsUrl = "api/car";
+    private string _driversUrl = "api/driver";
 
-    private bool showClients = false;
-    private bool showTripCounts = false;
-    private bool showTopDrivers = false;
-    private bool showDriverStats = false;
-    private bool showTopClients = false;
-    private bool showDriverCarInfo = false;
+    private bool _showClients = false;
+    private bool _showTripCounts = false;
+    private bool _showTopDrivers = false;
+    private bool _showDriverStats = false;
+    private bool _showTopClients = false;
+    private bool _showDriverCarInfo = false;
 
     private StatsFormModel formModel = new();
 
@@ -284,7 +284,7 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     {
         try
         {
-            _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
+            _drivers = await Http.GetFromJsonAsync<List<Driver>>(_driversUrl) ?? new List<Driver>();
         }
         catch (Exception ex)
         {
@@ -299,10 +299,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
             DateTime? startDate = formModel.startDate;
             DateTime? endDate = formModel.endDate;
 
-            var url = $"{tripsUrl}/passengers?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
+            var url = $"{_tripsUrl}/passengers?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
             _clients = await Http.GetFromJsonAsync<List<Client>>(url) ?? new List<Client>();
 
-            showClients = true;
+            _showClients = true;
         }
         catch (Exception ex)
         {
@@ -314,10 +314,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     {
         try
         {
-            var url = $"{tripsUrl}/trip-counts";
+            var url = $"{_tripsUrl}/trip-counts";
             _tripCounts = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
 
-            showTripCounts = true;
+            _showTripCounts = true;
         }
         catch (Exception ex)
         {
@@ -329,10 +329,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     {
         try
         {
-            var url = $"{tripsUrl}/top-drivers";
+            var url = $"{_tripsUrl}/top-drivers";
             _topDrivers = await Http.GetFromJsonAsync<List<DriverTripCountDto>>(url) ?? new List<DriverTripCountDto>();
 
-            showTopDrivers = true;
+            _showTopDrivers = true;
         }
         catch (Exception ex)
         {
@@ -344,10 +344,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     {
         try
         {
-            var url = $"{tripsUrl}/driver-trip-stats";
+            var url = $"{_tripsUrl}/driver-trip-stats";
             _driverStats = await Http.GetFromJsonAsync<List<DriverTripStatsDto>>(url) ?? new List<DriverTripStatsDto>();
 
-            showDriverStats = true;
+            _showDriverStats = true;
         }
         catch (Exception ex)
         {
@@ -362,10 +362,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
             DateTime? startDate = formModel.startDate;
             DateTime? endDate = formModel.endDate;
 
-            var url = $"{tripsUrl}/top-clients?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
+            var url = $"{_tripsUrl}/top-clients?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
             _topClients = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
 
-            showTopClients = true;
+            _showTopClients = true;
         }
         catch (Exception ex)
         {
@@ -377,10 +377,10 @@ else if ((_topClients != null && !_topClients.Any()) &&  showTopClients)
     {
         try
         {
-            var url = $"{carsUrl}/driver/{formModel.driverId}";
-            driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url) ?? new DriverCarInfoDto();
+            var url = $"{_carsUrl}/driver/{formModel.driverId}";
+            _driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url) ?? new DriverCarInfoDto();
 
-            showDriverCarInfo = true;
+            _showDriverCarInfo = true;
         }
         catch (Exception ex)
         {
