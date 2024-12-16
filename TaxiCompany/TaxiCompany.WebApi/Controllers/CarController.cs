@@ -142,8 +142,7 @@ public class CarController(IRepository<Car> repository, IRepository<Driver> repo
         var driver = await repositoryDrivers.GetAsync(car.AssignedDriverId);
         if (driver != null)
         {
-            driver.AssignedCarId = 0;
-            await repositoryDrivers.PutAsync(driver.Id, driver);
+            await repositoryDrivers.DeleteAsync(driver.Id);
         }
 
         if (await repository.DeleteAsync(id)) return Ok();
