@@ -222,7 +222,6 @@ else if (!_topClients.Any() &&  showTopClients)
     private List<ClientTripCountDto> _topClients = new();
     private DriverCarInfoDto driverCarInfo = new();
     private List<Driver> _drivers = new();
-    // private int driverId = 0;
 
     private DateTime startDate = DateTime.Now;
     private DateTime endDate = DateTime.Now;
@@ -239,7 +238,6 @@ else if (!_topClients.Any() &&  showTopClients)
     private bool showDriverCarInfo = false;
 
     private StatsFormModel formModel = new();
-    // private DriverFormModel driverFormModel = new();
 
     protected override async Task OnInitializedAsync()
     {
@@ -248,17 +246,13 @@ else if (!_topClients.Any() &&  showTopClients)
 
     private async Task LoadDriversAsync()
     {
-        Console.WriteLine($"Loading drivers: {_drivers.Count()}");
         try
         {
             _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
-
-            Console.WriteLine($"Loaded drivers: {_drivers.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading drivers: {ex.Message}");
         }
     }
 
@@ -269,16 +263,14 @@ else if (!_topClients.Any() &&  showTopClients)
             DateTime? startDate = formModel.startDate;
             DateTime? endDate = formModel.endDate;
 
-            Console.WriteLine($"StartDate: {startDate}, EndDate: {endDate}");
             var url = $"{tripsUrl}/passengers?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
             _clients = await Http.GetFromJsonAsync<List<Client>>(url) ?? new List<Client>();
+
             showClients = true;
-            Console.WriteLine($"Loaded clients: {_clients.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
         }
     }
 
@@ -290,20 +282,10 @@ else if (!_topClients.Any() &&  showTopClients)
             _tripCounts = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
 
             showTripCounts = true;
-
-            if (_tripCounts.Any())
-            {
-                Snackbar.Add("Trip counts loaded successfully!", Severity.Success);
-            }
-            else
-            {
-                Snackbar.Add("No trip counts found.", Severity.Warning);
-            }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading trip counts: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading trip counts: {ex.Message}", Severity.Error);
         }
     }
 
@@ -315,24 +297,10 @@ else if (!_topClients.Any() &&  showTopClients)
             _topDrivers = await Http.GetFromJsonAsync<List<DriverTripCountDto>>(url);
 
             showTopDrivers = true;
-
-            if (_topDrivers.Any())
-            {
-                Snackbar.Add("Top drivers loaded successfully!", Severity.Success);
-                foreach (var driver in _topDrivers)
-                {
-                    Console.WriteLine($"Driver: {driver.Driver.FullName}, Trips: {driver.TripCount}");
-                }
-            }
-            else
-            {
-                Snackbar.Add("No top drivers found.", Severity.Warning);
-            }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading top drivers: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading top drivers: {ex.Message}", Severity.Error);
         }
     }
 
@@ -344,20 +312,10 @@ else if (!_topClients.Any() &&  showTopClients)
             _driverStats = await Http.GetFromJsonAsync<List<DriverTripStatsDto>>(url) ?? new List<DriverTripStatsDto>();
 
             showDriverStats = true;
-
-            if (_driverStats.Any())
-            {
-                Snackbar.Add("Driver trip stats loaded successfully!", Severity.Success);
-            }
-            else
-            {
-                Snackbar.Add("No driver trip stats found.", Severity.Warning);
-            }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading driver stats: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading driver stats: {ex.Message}", Severity.Error);
         }
     }
 
@@ -369,16 +327,13 @@ else if (!_topClients.Any() &&  showTopClients)
             DateTime? endDate = formModel.endDate;
 
             var url = $"{tripsUrl}/top-clients?startDate={startDate:yyyy-MM-ddTHH:mm:ss}&endDate={endDate:yyyy-MM-ddTHH:mm:ss}";
-            Console.WriteLine($"StartDate: {startDate}, EndDate: {endDate}");
             _topClients = await Http.GetFromJsonAsync<List<ClientTripCountDto>>(url) ?? new List<ClientTripCountDto>();
 
             showTopClients = true;
-            Console.WriteLine($"Loaded top clients: {_topClients.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading top clients: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading top clients: {ex.Message}", Severity.Error);
         }
     }
 
@@ -386,19 +341,14 @@ else if (!_topClients.Any() &&  showTopClients)
     {
         try
         {
-            Console.WriteLine($"Driver Id: {formModel.driverId}");
             var url = $"{carsUrl}/driver/{formModel.driverId}";
             driverCarInfo = await Http.GetFromJsonAsync<DriverCarInfoDto>(url);
 
             showDriverCarInfo = true;
-
-            Console.WriteLine($"Loaded driver: {driverCarInfo.Driver.FullName}");
-            Console.WriteLine($"Loaded car: {driverCarInfo.Car.Model}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading driver and car info: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading driver and car info: {ex.Message}", Severity.Error);
         }
     }
 

@@ -86,12 +86,10 @@
         try
         {
             _drivers = await Http.GetFromJsonAsync<List<Driver>>(driversUrl) ?? new List<Driver>();
-            Console.WriteLine($"Loaded drivers: {_drivers.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading drivers: {ex.Message}", Severity.Error);
         }
     }
 
@@ -115,13 +113,11 @@
             else
             {
                 Snackbar.Add($"Failed to add driver: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to add driver: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error adding driver: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error adding driver: {ex.Message}", Severity.Error);
         }
     }
 
@@ -145,13 +141,11 @@
             else
             {
                 Snackbar.Add($"Failed to update driver: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to update driver: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error updating driver: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error updating driver: {ex.Message}", Severity.Error);
         }
     }
 
@@ -167,13 +161,11 @@
             else
             {
                 Snackbar.Add($"Failed to delete driver: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to delete driver: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error deleting driver: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error deleting driver: {ex.Message}", Severity.Error);
         }
     }
 

@@ -107,12 +107,10 @@
         try
         {
             _cars = await Http.GetFromJsonAsync<List<Car>>(carsUrl) ?? new List<Car>();
-            Console.WriteLine($"Loaded cars: {_cars.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
         }
     }
 
@@ -125,7 +123,6 @@
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading drivers: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading drivers: {ex.Message}");
         }
     }
 
@@ -152,13 +149,11 @@
             else
             {
                 Snackbar.Add($"Failed to add car: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to add car: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error adding car: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error adding car: {ex.Message}", Severity.Error);
         }
     }
 
@@ -184,13 +179,11 @@
             else
             {
                 Snackbar.Add($"Failed to update car: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to update car: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error updating car: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error updating car: {ex.Message}", Severity.Error);
         }
     }
 
@@ -206,13 +199,11 @@
             else
             {
                 Snackbar.Add($"Failed to delete car: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to delete car: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error deleting car: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error deleting car: {ex.Message}", Severity.Error);
         }
     }
 

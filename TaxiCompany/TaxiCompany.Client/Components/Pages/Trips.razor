@@ -129,12 +129,10 @@
         try
         {
             _trips = await Http.GetFromJsonAsync<List<Trip>>(tripsUrl) ?? new List<Trip>();
-            Console.WriteLine($"Loaded trips: {_trips.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading trips: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading trips: {ex.Message}", Severity.Error);
         }
     }
 
@@ -143,12 +141,10 @@
         try
         {
             _cars = await Http.GetFromJsonAsync<List<Car>>(carsUrl) ?? new List<Car>();
-            Console.WriteLine($"Loaded cars: {_cars.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading cars: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading cars: {ex.Message}", Severity.Error);
         }
     }
 
@@ -157,12 +153,10 @@
         try
         {
             _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
-            Console.WriteLine($"Loaded clients: {_clients.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading clients: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading clients: {ex.Message}", Severity.Error);
         }
     }
 
@@ -190,13 +184,11 @@
             else
             {
                 Snackbar.Add($"Failed to add trip: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to add trip: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error adding trip: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error adding trip: {ex.Message}", Severity.Error);
         }
     }
 
@@ -224,13 +216,11 @@
             else
             {
                 Snackbar.Add($"Failed to update trip: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to update trip: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error updating trip: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error updating trip: {ex.Message}", Severity.Error);
         }
     }
 
@@ -246,13 +236,11 @@
             else
             {
                 Snackbar.Add($"Failed to delete trip: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to delete trip: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error deleting trip: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error deleting trip: {ex.Message}", Severity.Error);
         }
     }
 

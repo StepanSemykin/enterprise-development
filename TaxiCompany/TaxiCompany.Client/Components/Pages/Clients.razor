@@ -78,12 +78,10 @@
         try
         {
             _clients = await Http.GetFromJsonAsync<List<Client>>(clientsUrl) ?? new List<Client>();
-            Console.WriteLine($"Loaded clients: {_clients.Count()}");
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error loading clients: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error loading clients: {ex.Message}", Severity.Error);
         }
     }
 
@@ -106,13 +104,11 @@
             else
             {
                 Snackbar.Add($"Failed to add client: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to add client: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error adding client: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error adding client: {ex.Message}", Severity.Error);
         }
     }
 
@@ -135,13 +131,11 @@
             else
             {
                 Snackbar.Add($"Failed to update client: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to update client: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error updating client: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error updating client: {ex.Message}", Severity.Error);
         }
     }
 
@@ -157,13 +151,11 @@
             else
             {
                 Snackbar.Add($"Failed to delete client: {response.StatusCode}", Severity.Error);
-                Console.WriteLine($"Failed to delete client: {response.StatusCode}", Severity.Error);
             }
         }
         catch (Exception ex)
         {
             Snackbar.Add($"Error deleting client: {ex.Message}", Severity.Error);
-            Console.WriteLine($"Error deleting client: {ex.Message}", Severity.Error);
         }
     }
 

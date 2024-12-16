@@ -22,13 +22,12 @@ builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddMudServices();
 
-builder.Services
-    .AddBlazorise(options =>
-    {
-        options.Immediate = true;
-    })
-    .AddBootstrap5Providers()
-    .AddFontAwesomeIcons();
+builder.Services.AddBlazorise(options =>
+{
+    options.Immediate = true;
+})
+.AddBootstrap5Providers()
+.AddFontAwesomeIcons();
 
 var app = builder.Build();
 
